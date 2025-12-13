@@ -1,0 +1,133 @@
+/* Estilos Generales */
+body {
+    font-family: 'Verdana', sans-serif; /* Letra más redonda y amable */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #fff8e1; /* Fondo crema suave */
+    color: #4e342e; /* Texto color café oscuro */
+}
+
+/* Header naranja amigable */
+header {
+    background-color: #ff8f00; 
+    color: #fff;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 5px solid #ff6f00;
+}
+
+h1 { margin: 0; }
+h2 { color: #e65100; border-bottom: 2px solid #ffcc80; display: inline-block; }
+h3 { color: #ef6c00; }
+
+/* Navegación */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Contenedor Principal */
+main {
+    padding: 20px;
+    max-width: 850px;
+    margin: 20px auto;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+}
+
+/* Tabla con estilo */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #fff;
+}
+
+th, td {
+    padding: 12px;
+    border: 2px solid #ffecb3;
+    text-align: center;
+}
+
+th {
+    background-color: #ffca28;
+    color: #4e342e;
+}
+
+/* Imagen y Video redondeados */
+img, video {
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Formulario */
+form {
+    background: #fff3e0;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #ffe0b2;
+    max-width: 500px;
+    margin: auto;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcc80;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #ff6f00;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px; /* Botón redondeado */
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #e65100;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #4e342e;
+    color: #ffecb3;
+    margin-top: 20px;
+}
