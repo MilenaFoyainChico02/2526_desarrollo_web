@@ -1,0 +1,30 @@
+/* color del botón principal de Bootstrap  */
+.btn-primary {
+    background-color: #ff5733;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s; /* Transiciones suaves [cite: 124] */
+}
+
+/* Animación al pasar el mouse por el botón  */
+.btn-primary:hover {
+    transform: scale(1.1); /* Agranda el botón un poco */
+    background-color: #e64a19;
+    box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.3); /* Sombra avanzada  */
+}
+
+/* Bordes redondeados para las tarjetas */
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Media Query personalizada para pantallas pequeñas  */
+@media (max-width: 600px) {
+    body {
+        background-color: #f8f9fa; /* Color de fondo ligero en móviles */
+    }
+    h1 {
+        font-size: 1.5rem; /* Letra más pequeña en celulares */
+    }
+}
