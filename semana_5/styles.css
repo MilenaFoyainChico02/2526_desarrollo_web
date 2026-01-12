@@ -1,0 +1,70 @@
+/* Estilos generales */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Panel de controles */
+.controls {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+input {
+    padding: 10px;
+    width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.btn-primary { background-color: #4CAF50; color: white; } /* Verde adopción */
+.btn-danger { background-color: #ff4d4d; color: white; }
+
+/* Galería Grid */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Estilo de las imágenes */
+.pet-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 4px solid transparent; /* Borde invisible por defecto */
+}
+
+.pet-image:hover {
+    transform: scale(1.05); /* Pequeña animación opcional */
+}
+
+/* CLASE CLAVE: Resalta la imagen seleccionada */
+.selected {
+    border-color: #ff9800; /* Borde naranja fuerte */
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+    transform: scale(0.95);
+}
