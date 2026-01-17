@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc; /* Borde por defecto */
+    border-radius: 4px;
+    box-sizing: border-box; /* Para que el padding no rompa el ancho */
+    transition: border-color 0.3s;
+}
+
+/* Estilos de Validación */
+input.valido {
+    border-color: #2ecc71; /* Verde */
+    background-color: #eafaf1;
+}
+
+input.invalido {
+    border-color: #e74c3c; /* Rojo */
+    background-color: #fceae9;
+}
+
+/* Mensajes de error */
+.error-msg {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    display: none; /* Oculto por defecto */
+    margin-top: 5px;
+}
+
+/* Mostrar mensaje si el input tiene la clase invalido */
+input.invalido + .error-msg {
+    display: block;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#btnSubmit {
+    background-color: #2ecc71;
+    color: white;
+}
+
+#btnSubmit:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#btnReset {
+    background-color: #e74c3c;
+    color: white;
+}
