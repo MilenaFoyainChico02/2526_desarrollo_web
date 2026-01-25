@@ -1,0 +1,25 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  border: 1px solid #780f0f;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+input {
+  margin-bottom: 6px;
+  padding: 6px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
