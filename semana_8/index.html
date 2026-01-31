@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adopción de Mascotas</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- CSS Personalizado -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .titulo-principal {
+      color: #92b0dd;
+      font-weight: bold;
+    }
+
+    footer {
+      background-color: #1f4469;
+      color: white;
+      padding: 20px;
+    }
+
+    footer a {
+      color: #ffdd57;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- encabezado -->
+  <header class="bg-dark text-white p-3">
+    <div class="container">
+      <h1 class="titulo-principal"> Adopta una Mascota</h1>
+
+      <!-- Menú de Navegación -->
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Inicio</a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="#carrusel">Mascotas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#tabla">Productos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#contacto">Contacto</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!--  sección personal -->
+  <main class="container mt-4">
+
+    <!--  carrusel -->
+    <section id="carrusel">
+      <h2 class="mb-3"> Mascotas en adopción</h2>
+
+      <div id="carouselMascotas" class="carousel slide" data-bs-ride="carousel">
+
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="https://placedog.net/900/300?id=1" class="d-block w-100" alt="Perro 1">
+          </div>
+
+          <div class="carousel-item">
+            <img src="https://placedog.net/900/300?id=2" class="d-block w-100" alt="Perro 2">
+          </div>
+
+          <div class="carousel-item">
+            <img src="https://placedog.net/900/300?id=3" class="d-block w-100" alt="Perro 3">
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselMascotas" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselMascotas" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+
+      </div>
+    </section>
+
+    <hr>
+
+    <!--  tabla de productos -->
+    <section id="tabla">
+      <h2 class="mb-3"> Productos para mascotas</h2>
+
+      <table class="table table-striped table-bordered text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Collar</td>
+            <td>$10</td>
+            <td>Collar cómodo para perros pequeños</td>
+          </tr>
+          <tr>
+            <td>Comida Premium</td>
+            <td>$25</td>
+            <td>Alimento nutritivo para mascotas</td>
+          </tr>
+          <tr>
+            <td>Juguete</td>
+            <td>$8</td>
+            <td>Pelota resistente para diversión</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <!--  botón de alerta -->
+    <section class="text-center mb-4">
+      <button class="btn btn-warning" onclick="mostrarAlerta()">
+         Haz clic para una sorpresa
+      </button>
+    </section>
+
+    <!--  formulario de contacto -->
+    <section id="contacto">
+      <h2 class="mb-3"> Contáctanos</h2>
+
+      <form id="formularioContacto" class="p-4 border rounded bg-white">
+
+        <!-- Nombre -->
+        <div class="mb-3">
+          <label class="form-label">Nombre *</label>
+          <input type="text" id="nombre" class="form-control">
+          <small class="text-danger" id="errorNombre"></small>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label">Correo Electrónico *</label>
+          <input type="email" id="email" class="form-control">
+          <small class="text-danger" id="errorEmail"></small>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="mb-3">
+          <label class="form-label">Mensaje *</label>
+          <textarea id="mensaje" class="form-control"></textarea>
+          <small class="text-danger" id="errorMensaje"></small>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">
+          Enviar Mensaje
+        </button>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- pie de pagina -->
+  <footer class="text-center mt-5">
+    <p> Contacto: adopciones@mascotas.com</p>
+    <p>
+      Síguenos en:
+      <a href="#">Facebook</a> |
+      <a href="#">Instagram</a>
+    </p>
+    <p>© 2026 Adopta una Mascota</p>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Javascript interactivo -->
+  <script>
+    // alerta
+    function mostrarAlerta() {
+      alert("🐾 Gracias por apoyar la adopción. ¡Una mascota te espera!");
+    }
+
+    // validación del formulario
+    document.getElementById("formularioContacto").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      let valido = true;
+
+      // Capturar valores
+      let nombre = document.getElementById("nombre").value.trim();
+      let email = document.getElementById("email").value.trim();
+      let mensaje = document.getElementById("mensaje").value.trim();
+
+      // Limpiar errores
+      document.getElementById("errorNombre").textContent = "";
+      document.getElementById("errorEmail").textContent = "";
+      document.getElementById("errorMensaje").textContent = "";
+
+      // Validar Nombre
+      if (nombre === "") {
+        document.getElementById("errorNombre").textContent = "El nombre es obligatorio.";
+        valido = false;
+      }
+
+      // Validar Email
+      if (email === "") {
+        document.getElementById("errorEmail").textContent = "El correo es obligatorio.";
+        valido = false;
+      }
+
+      // Validar Mensaje
+      if (mensaje === "") {
+        document.getElementById("errorMensaje").textContent = "El mensaje es obligatorio.";
+        valido = false;
+      }
+
+      // Enviar si todo está correcto
+      if (valido) {
+        alert(" Formulario enviado correctamente. ¡Gracias!");
+        document.getElementById("formularioContacto").reset();
+      }
+    });
+  </script>
+
+</body>
+</html>
