@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %} Página de la cartelera {% endblock %}
+{% block content %}
+    <h2> Lista de funciones </h2>
+    <a href="{{url_for('cartelera_nuevo')}}" class="btn btn-primary">Agregar nueva película</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.id }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>{{ producto.precio }}</td>
+                <td>{{ producto.cantidad }}</td>
+                <td>
+                    <a href="{{url_for('producto_editar', id=producto.id) }}">Editar</a>
+                    <a href="{{url_for('producto_eliminar', id=producto.id)}}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %} Página de cartelera {% endblock %}
+
+{% block content %}
+    <h2>{{Funciones}}</h2>
+    <form method="POST">
+        {{form.hidden_tag()}}
+        <p>
+            {{form.nombre.label}}<br>
+            {{form.nombre()}}
+        </p>
+        <p>
+            {{form.descripcion.label}}<br>
+            {{form.descripcion()}}
+        </p>
+        <p>
+            {{form.cantidad.label}}<br>
+            {{form.cantidad()}}
+        </p>
+        <p>
+            {{form.precio.label}}<br>
+            {{form.precio()}}
+        </p>
+        <p>
+            {{form.submit()}}
+        </p>
+    </form>
+{% endblock %}

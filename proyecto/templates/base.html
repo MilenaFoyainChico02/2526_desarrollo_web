@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} Cimazon {% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Cimazon</h1>
+        <nav>
+    <ul class="menu-vertical">
+        <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Acerca de Cimazon</a></li>
+        <li><a href="{{ url_for('bar') }}">Snack bar</a></li>
+        <li><a href="{{ url_for('usuario') }}">Mi cuenta</a></li>
+        <li><a href="{{ url_for('cartelera_nuevo') }}">Funciones nuevas</a></li>
+
+    </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Cimazon - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
