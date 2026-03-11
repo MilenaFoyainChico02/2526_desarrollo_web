@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %} Datos {% endblock %}
+
+{% block content %}
+<h2>Persistencia de datos con txt, json y csv</h2>
+<form method="post">
+    <label for="">Nombre</label>
+    <input type="text" name="nombre" id="">
+
+    <label for="">Descripción</label>
+    <input type="text" name="descripcion" id="">
+
+    <label for="">Precio</label>
+    <input type="text" name="precio" id="">
+
+    <label for="">Cantidad</label>
+    <input type="text" name="cantidad" id="">
+</form>
+<hr>
+<h3>txt</h3>
+<ul>
+    {% for line in datos_txt %}
+    <li>{{line}}</li>
+    {% endfor %}
+</ul>
+
+<h3>json</h3>
+<pre>{{datos_json | tojson(indent=2)}}</pre>
+
+<h3>csv</h3>
+<table border="1">
+    <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+    </tr>
+    {% for item in datos_csv %}
+    <tr>
+        <td>{{item.nombre}}</td>
+        <td>{{item.descripcion}}</td>
+        <td>{{item.precio}}</td>
+        <td>{{item.cantidad}}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}
