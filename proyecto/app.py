@@ -10,7 +10,7 @@ from inventario import inv_persistencia as persistencia
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mi_llave_secreta'
 
-app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite=///invent.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///invent.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -32,7 +32,6 @@ def about():
 def cartelera_nuevo():
     form = carteleraForm()
     if form.validate_on_submit():
-        
         nombre = form.nombre.data
         descripcion = form.descripcion.data
         cantidad = int(form.cantidad.data)
@@ -46,40 +45,53 @@ def cartelera_nuevo():
 # ruta para listar productos
 @app.route('/funciones')
 def funciones_listar():
-    inventario.cargar_desde_db() 
-    Lista_productos =inventario.productos.values()
+    inventario.cargar_desde_db()
+    Lista_productos = inventario.productos.values()
     return render_template('cartelera.html', productos=Lista_productos)
 
 # ruta para editar funciones
 @app.route('/productos/editar/<int:id>', methods=['GET', 'POST'])
 def producto_editar(id):
     producto = inventario.productos.get(id)
-    form = carteleraForm()
-    if form.validate_on_submit():
-        print("¡El formulario es válido! Intentando guardar...") 
-        inventario.actualizar_producto(id, form.nombre.data, form.descripcion.data, 
-                                      int(form.cantidad.data), float(form.precio.data))
+    if producto is None:
+        flash('Producto no encontrado', 'danger')
         return redirect(url_for('funciones_listar'))
-    
-    if request.method == 'POST':
-        print("Errores de validación:", form.errors) 
-    
+
+    form = carteleraForm()
+
+    if request.method == 'GET':
+        form.nombre.data = producto.nombre
+        form.descripcion.data = producto.descripcion
+        form.cantidad.data = producto.cantidad
+        form.precio.data = producto.precio
+
+    if form.validate_on_submit():
+        inventario.actualizar_producto(
+            id,
+            form.nombre.data,
+            form.descripcion.data,
+            int(form.cantidad.data),
+            float(form.precio.data)
+        )
+        flash('Película actualizada exitosamente', 'success')
+        return redirect(url_for('funciones_listar'))
+
+    if request.method == 'POST' and not form.validate():
+        flash('Errores de validación en el formulario', 'danger')
+
     return render_template('producto_editar.html', form=form, producto=producto)
 
 # ruta para eliminar funciones
 @app.route('/productos/eliminar/<int:id>', methods=['GET', 'POST'])
 def producto_eliminar(id):
-
     if inventario.eliminar_producto(id):
         flash('Película eliminada correctamente', 'warning')
     else:
         flash('No se pudo encontrar la película', 'danger')
-    
     return redirect(url_for('funciones_listar'))
 
-
-# ruta para los datos persistentes 
-@app.route('datos')
+# ruta para los datos persistentes
+@app.route('/datos', methods=['GET', 'POST'])
 def datos():
     if request.method == 'POST':
         nombre = request.form.get('nombre')
@@ -87,7 +99,6 @@ def datos():
         cantidad = request.form.get('cantidad')
         precio = request.form.get('precio')
 
-        # registrar en base de datos
         dic = {
             'nombre': nombre,
             'descripcion': descripcion,
@@ -95,13 +106,11 @@ def datos():
             'precio': precio
         }
 
-        # guardar en los tres formatos
         guardar_txt(f"{nombre}, {descripcion}, {cantidad}, {precio}")
         guardar_json(dic)
         flash('Datos guardados exitosamente', 'success')
         return redirect(url_for('datos'))
-    
-    # leer en los tres formatos
+
     datos_txt = leer_txt()
     datos_json = leer_json()
     datos_csv = leer_csv()
