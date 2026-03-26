@@ -15,6 +15,7 @@
 
     <label for="">Cantidad</label>
     <input type="text" name="cantidad" id="">
+    <button type="submit">Guardar </button>
 </form>
 <hr>
 <h3>txt</h3>
@@ -37,11 +38,11 @@
     </tr>
     {% for item in datos_csv %}
     <tr>
-        <td>{{item.nombre}}</td>
-        <td>{{item.descripcion}}</td>
-        <td>{{item.precio}}</td>
-        <td>{{item.cantidad}}</td>
+        <td>{{ item[0] }}</td>
+        <td>{{ item[1] }}</td>
+        <td>{{ item[3] }}</td>
+        <td>{{ item[2] }}</td>
     </tr>
-{% endfor %}
+    {% endfor %}
 </table>
 {% endblock %}

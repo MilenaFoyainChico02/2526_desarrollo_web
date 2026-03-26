@@ -55,6 +55,7 @@ def leer_csv():
     asegurar_data()
     if not CSV_FILE.exists():
         return []
+    
     with open(CSV_FILE, 'r', encoding="utf-8") as f:
         reader = csv.reader(f)
         next(reader, None)

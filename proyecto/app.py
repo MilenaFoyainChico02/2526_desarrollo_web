@@ -108,6 +108,7 @@ def datos():
 
         guardar_txt(f"{nombre}, {descripcion}, {cantidad}, {precio}")
         guardar_json(dic)
+        guardar_csv(dic)
         flash('Datos guardados exitosamente', 'success')
         return redirect(url_for('datos'))
 

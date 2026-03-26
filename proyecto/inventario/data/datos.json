@@ -1,0 +1,32 @@
+[
+    {
+        "nombre": "Interestelar",
+        "descripcion": "Un futuro distópico donde la tierra se vuelve inhabitable",
+        "cantidad": "56",
+        "precio": "5"
+    },
+    {
+        "nombre": "hola",
+        "descripcion": "buen día",
+        "cantidad": "32",
+        "precio": "6"
+    },
+    {
+        "nombre": "ata",
+        "descripcion": "",
+        "cantidad": "",
+        "precio": ""
+    },
+    {
+        "nombre": "Atacando Paris",
+        "descripcion": "Ataque terrorista en Paris",
+        "cantidad": "76",
+        "precio": "6"
+    },
+    {
+        "nombre": "aplicaciones web",
+        "descripcion": "cuarto semestre",
+        "cantidad": "10",
+        "precio": "3"
+    }
+]
