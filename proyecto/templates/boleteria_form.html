@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Formulario de Boleto{% endblock %}
+
+{% block content %}
+    <h2>{{ titulo }}</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.pelicula.label }}<br>
+            {{ form.pelicula() }}
+        </p>
+        <p>
+            {{ form.codigo_sala.label }}<br>
+            {{ form.codigo_sala() }}
+        </p>
+        <p>
+            {{ form.butaca.label }}<br>
+            {{ form.butaca() }}
+        </p>
+        <p>
+            {{ form.hora_funcion.label }}<br>
+            {{ form.hora_funcion() }}
+        </p>
+        <p>
+            {{ form.submit(value='Guardar boleto') }}
+            <a href="{{ url_for('boleteria') }}">Cancelar</a>
+        </p>
+    </form>
+{% endblock %}

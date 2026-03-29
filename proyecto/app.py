@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash
-from form import carteleraForm
+from form import carteleraForm, BoletoForm
 from inventario.bd import init_db
 from inventario.inventario import Inventario
 from inventario.funcion import funciones as Producto, Boleto
@@ -123,7 +123,7 @@ def boleteria():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
+        cursor.execute('SELECT * from boleto')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -132,6 +132,113 @@ def boleteria():
     except Exception as e:
         flash(f'Error al conectar a la base de datos: {e}', 'danger')
         return redirect(url_for('inicio'))
+
+
+@app.route('/boleteria/nuevo', methods=['GET', 'POST'])
+def boleteria_nuevo():
+    form = BoletoForm()
+    if form.validate_on_submit():
+        pelicula = form.pelicula.data
+        codigo_sala = form.codigo_sala.data
+        butaca = form.butaca.data
+        hora_funcion = form.hora_funcion.data
+
+        try:
+            conn = conectar()
+            if conn is None or not conn.is_connected():
+                flash('Conexión a la base de datos fallida', 'danger')
+                return redirect(url_for('boleteria'))
+
+            cursor = conn.cursor()
+            cursor.execute('USE cimazon')
+            cursor.execute(
+                'INSERT INTO boleto (pelicula, codigo_sala, butaca, hora_funcion) VALUES (%s, %s, %s, %s)',
+                (pelicula, codigo_sala, butaca, hora_funcion)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash('Boleto agregado exitosamente', 'success')
+            return redirect(url_for('boleteria'))
+        except Exception as e:
+            flash(f'Error al guardar el boleto: {e}', 'danger')
+            return redirect(url_for('boleteria'))
+
+    return render_template('boleteria_form.html', form=form, titulo='Nuevo boleto')
+
+
+@app.route('/boleteria/editar/<int:id>', methods=['GET', 'POST'])
+def boleteria_editar(id):
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('boleteria'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT * FROM boleto WHERE id_boleto = %s', (id,))
+        row = cursor.fetchone()
+
+        if row is None:
+            cursor.close()
+            conn.close()
+            flash('Boleto no encontrado', 'danger')
+            return redirect(url_for('boleteria'))
+
+        boleto = Boleto(row[0], row[1], row[2], row[3], row[4])
+        form = BoletoForm()
+
+        if request.method == 'GET':
+            form.pelicula.data = boleto.pelicula
+            form.codigo_sala.data = boleto.codigo_sala
+            form.butaca.data = boleto.butaca
+            form.hora_funcion.data = boleto.hora_funcion
+
+        if form.validate_on_submit():
+            cursor.execute(
+                'UPDATE boleto SET pelicula = %s, codigo_sala = %s, butaca = %s, hora_funcion = %s WHERE id_boleto = %s',
+                (form.pelicula.data, form.codigo_sala.data, form.butaca.data, form.hora_funcion.data, id)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash('Boleto actualizado exitosamente', 'success')
+            return redirect(url_for('boleteria'))
+
+        cursor.close()
+        conn.close()
+        return render_template('boleteria_form.html', form=form, titulo='Editar boleto')
+    except Exception as e:
+        flash(f'Error al editar el boleto: {e}', 'danger')
+        return redirect(url_for('boleteria'))
+
+
+@app.route('/boleteria/eliminar/<int:id>', methods=['GET', 'POST'])
+def boleteria_eliminar(id):
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('boleteria'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('DELETE FROM boleto WHERE id_boleto = %s', (id,))
+        conn.commit()
+        eliminados = cursor.rowcount
+        cursor.close()
+        conn.close()
+
+        if eliminados > 0:
+            flash('Boleto eliminado correctamente', 'warning')
+        else:
+            flash('No se encontró el boleto a eliminar', 'danger')
+
+        return redirect(url_for('boleteria'))
+    except Exception as e:
+        flash(f'Error al eliminar el boleto: {e}', 'danger')
+        return redirect(url_for('boleteria'))
 
 
 # ruta para los datos persistentes
