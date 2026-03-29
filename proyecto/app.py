@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash
 from form import carteleraForm
 from inventario.bd import init_db
 from inventario.inventario import Inventario
-from inventario.funcion import funciones as Producto
+from inventario.funcion import funciones as Producto, Boleto
 from flask_sqlalchemy import SQLAlchemy
 from inventario.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
 from inventario import inv_persistencia as persistencia
@@ -102,7 +102,7 @@ def funciones_mysql():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM producto')
+        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -111,6 +111,28 @@ def funciones_mysql():
     except Exception as e:
         flash(f'Error al conectar a la base de datos: {e}', 'danger')
         return redirect(url_for('inicio'))
+    
+# ruta para la boleteria con mysql
+@app.route('/boleteria')
+def boleteria():
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('inicio'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        boletos_mysql = [Boleto(row[0], row[1], row[2], row[3], row[4]) for row in rows]
+        return render_template('boleteria.html', boletos=boletos_mysql)
+    except Exception as e:
+        flash(f'Error al conectar a la base de datos: {e}', 'danger')
+        return redirect(url_for('inicio'))
+
 
 # ruta para los datos persistentes
 @app.route('/datos', methods=['GET', 'POST'])

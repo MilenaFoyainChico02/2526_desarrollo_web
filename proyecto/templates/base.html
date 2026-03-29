@@ -13,11 +13,20 @@
         <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
         <li><a href="{{ url_for('about') }}">Acerca de Cimazon</a></li>
         <li><a href="{{ url_for('cartelera_nuevo') }}">Funciones nuevas</a></li>
-        <li><a href="{{ url_for('funciones_mysql') }}">Funciones MySQL</a></li>
 
     </ul>
         </nav>
     </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <main>
         {% block content %}{% endblock %}

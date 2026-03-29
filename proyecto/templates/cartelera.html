@@ -14,19 +14,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for producto in productos %}
+            {% if productos|length == 0 %}
             <tr>
-                <td>{{ producto.id }}</td>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.descripcion }}</td>
-                <td>{{ producto.mostrar_precio() }}</td>
-                <td>{{ producto.cantidad }}</td>
-                <td>
-                    <a href="{{url_for('producto_editar', id=producto.id) }}">Editar</a>
-                    <a href="{{url_for('producto_eliminar', id=producto.id)}}">Eliminar</a>
-                </td>
+                <td colspan="6">No hay funciones disponibles en MySQL.</td>
             </tr>
-            {% endfor %}
+            {% else %}
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>{{ producto.mostrar_precio() }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>
+                        <a href="{{url_for('producto_editar', id=producto.id) }}">Editar</a>
+                        <a href="{{url_for('producto_eliminar', id=producto.id)}}">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
         </tbody>
     </table>
 {% endblock %}
