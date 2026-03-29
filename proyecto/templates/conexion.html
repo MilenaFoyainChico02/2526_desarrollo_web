@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Conexión a la base de datos{% endblock %}
+
+{% block content %}
+    <h2>Conexión a la base de datos</h2>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% elif rows is not none and rows|length == 0 %}
+        <p>No se encontraron registros en la tabla.</p>
+    {% else %}
+        <p>Conexión exitosa. Tabla: <strong>{{ table }}</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    {% for col in columns %}
+                        <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

@@ -48,7 +48,7 @@ def guardar_csv(datos_peli: dict):
         if not existe:
             # Ponemos los encabezados de Cimazon
             writer.writerow(['Nombre', 'Descripcion', 'Cantidad', 'Precio'])
-        # Guardamos solo los valores del diccionario
+        # guardamos solo los valores del diccionario
         writer.writerow(datos_peli.values())
 
 def leer_csv():
