@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash
-from form import carteleraForm, BoletoForm
+from form import carteleraForm, BoletoForm, FuncionForm
 from inventario.bd import init_db
 from inventario.inventario import Inventario
 from inventario.funcion import funciones as Producto, Boleto
@@ -7,17 +7,170 @@ from flask_sqlalchemy import SQLAlchemy
 from inventario.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
 from inventario import inv_persistencia as persistencia
 from conexion.conexion import conectar
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from forms.login_form import LoginForm
+from forms.registro_form import RegistroForm
+from services.usuario_service import crear_tabla_usuario, obtener_usuario_por_id, obtener_usuario_por_email, registrar_usuario
+
+try:
+    from fpdf import FPDF
+except ImportError:
+    FPDF = None
+
+from flask import make_response
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mi_llave_secreta'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///invent.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Debes iniciar sesión para acceder a esta página'
+login_manager.login_message_category = 'warning'
 
-init_db()
+crear_tabla_usuario()
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///invent.db'
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#db = SQLAlchemy(app)
+
+"""
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
 inventario = Inventario()
 inventario.cargar_desde_db()
+"""
+@login_manager.user_loader
+def load_user(user_id):
+    return obtener_usuario_por_id(user_id)
+
+
+def listar_productos():
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            return []
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos')
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return [
+            {
+                'id_producto': row[0],
+                'nombre': row[1],
+                'precio': row[4],
+                'cantidad': row[3]
+            }
+            for row in rows
+        ]
+    except Exception:
+        return []
+
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    form = RegistroForm()
+
+    if form.validate_on_submit():
+        nombre = form.nombre.data
+        email = form.email.data
+        password = request.form['password']
+
+        usuario_existente = obtener_usuario_por_email(email)
+        if usuario_existente:
+            flash('Ya existe un usuario con ese correo', 'danger')
+            return redirect(url_for('registro'))
+
+        password_hash = generate_password_hash(password)
+
+        registrar_usuario(nombre, email, password_hash)
+
+        flash('Usuario registrado correctamente', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('auth/registro.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+
+        usuario = obtener_usuario_por_email(email)
+
+        if usuario and check_password_hash(usuario.password, password):
+            login_user(usuario)
+            flash('Inicio de sesión exitoso', 'success')
+            return redirect(url_for('inicio'))
+        else:
+            flash('Correo o contraseña incorrectos', 'danger')
+
+    return render_template('auth/login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada correctamente', 'info')
+    return redirect(url_for('login'))
+
+# ruta de exportar PDF 
+@app.route('/exportar/pdf')
+@login_required
+def exportar_pdf():
+    if FPDF is None:
+        flash('La librería FPDF no está instalada. Instala el paquete fpdf y reinicia la aplicación.', 'danger')
+        return redirect(url_for('inicio'))
+
+    productos = listar_productos()
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Reporte de Productos ", ln=True, align="C")
+
+    pdf.ln(10)
+
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(20, 10, "ID", 1)
+    pdf.cell(60, 10, "Nombre", 1)
+    pdf.cell(30, 10, "Precio", 1)
+    pdf.cell(30, 10, "Cantidad", 1)
+    pdf.ln()
+
+    pdf.set_font("Arial", "", 10)
+
+    for p in productos:
+        pdf.cell(20, 10, str(p['id_producto']), 1)
+        pdf.cell(60, 10, p['nombre'], 1)
+        pdf.cell(30, 10, f"${p['precio']}", 1)
+        pdf.cell(30, 10, str(p['cantidad']), 1)
+        pdf.ln()
+
+    output_data = pdf.output(dest='S')
+    if isinstance(output_data, str):
+        output_bytes = output_data.encode('latin-1')
+    elif isinstance(output_data, (bytes, bytearray)):
+        output_bytes = bytes(output_data)
+    else:
+        output_bytes = str(output_data).encode('latin-1')
+
+    response = make_response(output_bytes)
+    response.headers.set('Content-Disposition', 'attachment', filename='productos.pdf')
+    response.headers.set('Content-Type', 'application/pdf')
+
+    return response
 
 # ruta principal
 @app.route('/')
@@ -38,58 +191,236 @@ def cartelera_nuevo():
         cantidad = int(form.cantidad.data)
         precio = float(form.precio.data)
 
-        inventario.agregar_producto(nombre, descripcion, cantidad, precio)
-        flash('Película agregada exitosamente', 'success')
-        return redirect(url_for('funciones_listar'))
-    return render_template('cartelera_form.html', form=form)
+        try:
+            conn = conectar()
+            if conn is None or not conn.is_connected():
+                flash('Conexión a la base de datos fallida', 'danger')
+                return redirect(url_for('funciones_mysql'))
 
-# ruta para listar productos con sqlite
+            cursor = conn.cursor()
+            cursor.execute('USE cimazon')
+            cursor.execute(
+                'INSERT INTO productos (nombre, descripcion, cantidad, precio) VALUES (%s, %s, %s, %s)',
+                (nombre, descripcion, cantidad, precio)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            flash('Función agregada exitosamente', 'success')
+            return redirect(url_for('funciones_mysql'))
+        except Exception as e:
+            flash(f'Error al guardar la función: {e}', 'danger')
+            return redirect(url_for('funciones_mysql'))
+
+    return render_template('cartelera_form.html', form=form, titulo='Agregar nueva función')
+
 @app.route('/funciones')
-def funciones_listar():
-    inventario.cargar_desde_db()
-    Lista_productos = inventario.productos.values()
-    return render_template('cartelera.html', productos=Lista_productos)
+@login_required
+def funciones():
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('inicio'))
 
-# ruta para editar funciones con sqlite
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        funciones = [
+            {
+                'id_funcion': row[0],
+                'descripcion': row[1],
+                'fecha_hora': row[2],
+                'total': float(row[3]) if row[3] is not None else 0,
+                'metodo_pago': row[4]
+            }
+            for row in rows
+        ]
+
+        return render_template('funciones.html', funciones=funciones)
+    except Exception as e:
+        flash(f'Error al cargar funciones: {e}', 'danger')
+        return redirect(url_for('inicio'))
+
+@app.route('/funciones/nuevo', methods=['GET', 'POST'])
+@login_required
+def funciones_nuevo():
+    form = FuncionForm()
+    if form.validate_on_submit():
+        try:
+            conn = conectar()
+            if conn is None or not conn.is_connected():
+                flash('Conexión a la base de datos fallida', 'danger')
+                return redirect(url_for('funciones'))
+
+            cursor = conn.cursor()
+            cursor.execute('USE cimazon')
+            cursor.execute(
+                'INSERT INTO funcion (descripcion, fecha_hora, total, metodo_pago) VALUES (%s, %s, %s, %s)',
+                (form.descripcion.data, form.fecha_hora.data, float(form.total.data), form.metodo_pago.data)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            flash('Función registrada correctamente', 'success')
+            return redirect(url_for('funciones'))
+        except Exception as e:
+            flash(f'Error al guardar la función: {e}', 'danger')
+            return redirect(url_for('funciones'))
+
+    return render_template('funciones_form.html', form=form, titulo='Nueva función')
+
+@app.route('/funciones/editar/<int:id>', methods=['GET', 'POST'])
+@login_required
+def funciones_editar(id):
+    form = FuncionForm()
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('funciones'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT descripcion, fecha_hora, total, metodo_pago FROM funcion WHERE id_funcion = %s', (id,))
+        row = cursor.fetchone()
+
+        if row is None:
+            cursor.close()
+            conn.close()
+            flash('Función no encontrada', 'danger')
+            return redirect(url_for('funciones'))
+
+        if request.method == 'GET':
+            form.descripcion.data = row[0]
+            form.fecha_hora.data = row[1]
+            form.total.data = float(row[2]) if row[2] is not None else 0
+            form.metodo_pago.data = row[3]
+
+        if form.validate_on_submit():
+            cursor.execute(
+                'UPDATE funcion SET descripcion = %s, fecha_hora = %s, total = %s, metodo_pago = %s WHERE id_funcion = %s',
+                (form.descripcion.data, form.fecha_hora.data, float(form.total.data), form.metodo_pago.data, id)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash('Función actualizada correctamente', 'success')
+            return redirect(url_for('funciones'))
+
+        cursor.close()
+        conn.close()
+        return render_template('funciones_form.html', form=form, titulo='Editar función')
+    except Exception as e:
+        flash(f'Error al editar la función: {e}', 'danger')
+        return redirect(url_for('funciones'))
+
+@app.route('/funciones/eliminar/<int:id>', methods=['POST', 'GET'])
+@login_required
+def funciones_eliminar(id):
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('funciones'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('DELETE FROM funcion WHERE id_funcion = %s', (id,))
+        conn.commit()
+        eliminados = cursor.rowcount
+        cursor.close()
+        conn.close()
+
+        if eliminados > 0:
+            flash('Función eliminada correctamente', 'warning')
+        else:
+            flash('No se encontró la función', 'danger')
+
+        return redirect(url_for('funciones'))
+    except Exception as e:
+        flash(f'Error al eliminar la función: {e}', 'danger')
+        return redirect(url_for('funciones'))
+
+@app.route('/productos')
+def productos():
+    return redirect(url_for('funciones_mysql'))
+
 @app.route('/productos/editar/<int:id>', methods=['GET', 'POST'])
 def producto_editar(id):
-    producto = inventario.productos.get(id)
-    if producto is None:
-        flash('Producto no encontrado', 'danger')
-        return redirect(url_for('funciones_listar'))
-
     form = carteleraForm()
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('funciones_mysql'))
 
-    if request.method == 'GET':
-        form.nombre.data = producto.nombre
-        form.descripcion.data = producto.descripcion
-        form.cantidad.data = producto.cantidad
-        form.precio.data = producto.precio
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos WHERE id = %s', (id,))
+        row = cursor.fetchone()
 
-    if form.validate_on_submit():
-        inventario.actualizar_producto(
-            id,
-            form.nombre.data,
-            form.descripcion.data,
-            int(form.cantidad.data),
-            float(form.precio.data)
-        )
-        flash('Película actualizada exitosamente', 'success')
-        return redirect(url_for('funciones_listar'))
+        if row is None:
+            cursor.close()
+            conn.close()
+            flash('Función no encontrada', 'danger')
+            return redirect(url_for('funciones_mysql'))
 
-    if request.method == 'POST' and not form.validate():
-        flash('Errores de validación en el formulario', 'danger')
+        if request.method == 'GET':
+            form.nombre.data = row[1]
+            form.descripcion.data = row[2]
+            form.cantidad.data = row[3]
+            form.precio.data = row[4]
 
-    return render_template('producto_editar.html', form=form, producto=producto)
+        if form.validate_on_submit():
+            cursor.execute(
+                'UPDATE productos SET nombre = %s, descripcion = %s, cantidad = %s, precio = %s WHERE id = %s',
+                (form.nombre.data, form.descripcion.data, int(form.cantidad.data), float(form.precio.data), id)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash('Función actualizada exitosamente', 'success')
+            return redirect(url_for('funciones_mysql'))
 
-# ruta para eliminar funciones con sqlite
+        cursor.close()
+        conn.close()
+        return render_template('producto_editar.html', form=form, producto=row)
+    except Exception as e:
+        flash(f'Error al editar la función: {e}', 'danger')
+        return redirect(url_for('funciones_mysql'))
+
 @app.route('/productos/eliminar/<int:id>', methods=['GET', 'POST'])
 def producto_eliminar(id):
-    if inventario.eliminar_producto(id):
-        flash('Película eliminada correctamente', 'warning')
-    else:
-        flash('No se pudo encontrar la película', 'danger')
-    return redirect(url_for('funciones_listar'))
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('funciones_mysql'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('DELETE FROM productos WHERE id = %s', (id,))
+        conn.commit()
+        eliminados = cursor.rowcount
+        cursor.close()
+        conn.close()
+
+        if eliminados > 0:
+            flash('Función eliminada correctamente', 'warning')
+        else:
+            flash('No se encontró la función', 'danger')
+
+        return redirect(url_for('funciones_mysql'))
+    except Exception as e:
+        flash(f'Error al eliminar la función: {e}', 'danger')
+        return redirect(url_for('funciones_mysql'))
 
 # ruta para listar productos con mysql
 @app.route('/funciones_mysql')

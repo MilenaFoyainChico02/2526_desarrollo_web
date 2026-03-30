@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %} Funciones {% endblock %}
+
+{% block content %}
+    <section class="card">
+        <div class="card-header">
+            <h2>Funciones</h2>
+            <a href="{{ url_for('funciones_nuevo') }}" class="btn-cimazon">Agregar función</a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Descripción</th>
+                        <th>Fecha y hora</th>
+                        <th>Total</th>
+                        <th>Método de pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if funciones|length == 0 %}
+                    <tr>
+                        <td colspan="6">No hay funciones registradas.</td>
+                    </tr>
+                    {% else %}
+                        {% for funcion in funciones %}
+                        <tr>
+                            <td>{{ funcion.id_funcion }}</td>
+                            <td>{{ funcion.descripcion }}</td>
+                            <td>{{ funcion.fecha_hora }}</td>
+                            <td>${{ '%.2f' | format(funcion.total) }}</td>
+                            <td>{{ funcion.metodo_pago }}</td>
+                            <td>
+                                <a href="{{ url_for('funciones_editar', id=funcion.id_funcion) }}">Editar</a>
+                                <a href="{{ url_for('funciones_eliminar', id=funcion.id_funcion) }}">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

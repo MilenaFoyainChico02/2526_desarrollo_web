@@ -3,40 +3,46 @@
 {% block title %} Boletería {% endblock %}
 
 {% block content %}
-    <h2>Boletería</h2>
-    <p><a href="{{ url_for('boleteria_nuevo') }}" class="btn-cimazon">Agregar nuevo boleto</a></p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID boleto</th>
-                <th>Película</th>
-                <th>Sala</th>
-                <th>Butaca</th>
-                <th>Hora</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if boletos|length == 0 %}
-            <tr>
-                <td colspan="6">No hay boletos registrados.</td>
-            </tr>
-            {% else %}
-                {% for boleto in boletos %}
-                <tr>
-                    <td>{{ boleto.id_boleto }}</td>
-                    <td>{{ boleto.pelicula }}</td>
-                    <td>{{ boleto.codigo_sala }}</td>
-                    <td>{{ boleto.butaca }}</td>
-                    <td>{{ boleto.hora_funcion }}</td>
-                    <td>
-                        <a href="{{ url_for('boleteria_editar', id=boleto.id_boleto) }}">Editar</a>
-                        |
-                        <a href="{{ url_for('boleteria_eliminar', id=boleto.id_boleto) }}">Eliminar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% endif %}
-        </tbody>
-    </table>
+    <section class="card">
+        <div class="card-header">
+            <h2>Boletería</h2>
+            <a href="{{ url_for('boleteria_nuevo') }}" class="btn-cimazon">Agregar nuevo boleto</a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID boleto</th>
+                        <th>Película</th>
+                        <th>Sala</th>
+                        <th>Butaca</th>
+                        <th>Hora</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if boletos|length == 0 %}
+                    <tr>
+                        <td colspan="6">No hay boletos registrados.</td>
+                    </tr>
+                    {% else %}
+                        {% for boleto in boletos %}
+                        <tr>
+                            <td>{{ boleto.id_boleto }}</td>
+                            <td>{{ boleto.pelicula }}</td>
+                            <td>{{ boleto.codigo_sala }}</td>
+                            <td>{{ boleto.butaca }}</td>
+                            <td>{{ boleto.hora_funcion }}</td>
+                            <td>
+                                <a href="{{ url_for('boleteria_editar', id=boleto.id_boleto) }}">Editar</a>
+                                |
+                                <a href="{{ url_for('boleteria_eliminar', id=boleto.id_boleto) }}">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 {% endblock %}

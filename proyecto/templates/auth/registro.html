@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+    <section class="auth-form">
+        <h2>Crear una cuenta</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.nombre.label }}
+                {{ form.nombre(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label }}
+                {{ form.confirm_password(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn") }}
+            </div>
+        </form>
+        <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión aquí</a></p>
+    </section>
+{% endblock %}

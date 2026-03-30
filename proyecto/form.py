@@ -18,3 +18,11 @@ class BoletoForm(FlaskForm):
     butaca = StringField('Butaca', validators=[DataRequired(), Length(min=1, max=50)])
     hora_funcion = StringField('Hora de la función', validators=[DataRequired(), Length(min=2, max=50)])
     submit = SubmitField('Guardar boleto')
+
+
+class FuncionForm(FlaskForm):
+    descripcion = StringField('Descripción', validators=[DataRequired(), Length(min=5, max=500)])
+    fecha_hora = StringField('Fecha y hora', validators=[DataRequired(), Length(min=5, max=100)])
+    total = DecimalField('Total', validators=[DataRequired(), NumberRange(min=0)], places=2)
+    metodo_pago = StringField('Método de pago', validators=[DataRequired(), Length(min=2, max=100)])
+    submit = SubmitField('Guardar función')
