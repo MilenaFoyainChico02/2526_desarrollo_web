@@ -6,7 +6,9 @@
     <section class="card">
         <div class="card-header">
             <h2>Boletería</h2>
-            <a href="{{ url_for('boleteria_nuevo') }}" class="btn-cimazon">Agregar nuevo boleto</a>
+            <a href="{{ url_for('boleteria_nuevo') }}" class="btn-cimazon">
+                <i class="bi bi-ticket-perforated"></i>
+            </a>
         </div>
         <div class="card-body">
             <table class="table">
@@ -17,13 +19,13 @@
                         <th>Sala</th>
                         <th>Butaca</th>
                         <th>Hora</th>
-                        <th>Acciones</th>
+                        <th style="text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if boletos|length == 0 %}
                     <tr>
-                        <td colspan="6">No hay boletos registrados.</td>
+                        <td colspan="6" style="text-align: center;">No hay boletos registrados.</td>
                     </tr>
                     {% else %}
                         {% for boleto in boletos %}
@@ -33,10 +35,19 @@
                             <td>{{ boleto.codigo_sala }}</td>
                             <td>{{ boleto.butaca }}</td>
                             <td>{{ boleto.hora_funcion }}</td>
-                            <td>
-                                <a href="{{ url_for('boleteria_editar', id=boleto.id_boleto) }}">Editar</a>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <a href="{{ url_for('boleteria_editar', id=boleto.id_boleto) }}" 
+                                   class="btn-editar" 
+                                   title="Editar boleto">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
                                 
-                                <a href="{{ url_for('boleteria_eliminar', id=boleto.id_boleto) }}">Eliminar</a>
+                                <a href="{{ url_for('boleteria_eliminar', id=boleto.id_boleto) }}" 
+                                   class="btn-eliminar" 
+                                   title="Eliminar boleto"
+                                   onclick="return confirm('¿Estás seguro de que deseas anular este boleto?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}

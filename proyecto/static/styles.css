@@ -484,16 +484,46 @@ footer {
     margin-bottom: 25px;
     font-size: 2rem;
 }
-/* Para editar películas, funciones, boletos (ANCHO) */
+
 .contenedor-formulario {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-/* Para Login y Registro (ANGOSTO) */
+
 .contenedor-login {
-    max-width: 400px; /* Tamaño ideal para un login */
+    max-width: 400px; 
     margin: 60px auto;
     padding: 0 20px;
+}
+/* --- BOTONES DE ACCIÓN EN TABLAS --- */
+
+
+.btn-editar {
+    color: #ffcc00 !important; 
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-editar:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+    text-decoration: underline;
+}
+
+
+.btn-eliminar {
+    color: #ff5f5f !important; 
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 15px; 
+}
+
+.btn-eliminar:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 95, 95, 0.6);
+    text-decoration: underline;
 }

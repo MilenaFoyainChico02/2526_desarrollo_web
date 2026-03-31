@@ -1,10 +1,14 @@
 {% extends "base.html" %}
+
 {% block title %} Página de la cartelera {% endblock %}
+
 {% block content %}
     <section class="card">
         <div class="card-header">
             <h2>Lista de funciones</h2>
-            <a href="{{url_for('cartelera_nuevo')}}" class="btn-cimazon">Agregar nueva función</a>
+            <a href="{{url_for('cartelera_nuevo')}}" class="btn-cimazon">
+                <i class="bi bi-plus-circle"></i>
+            </a>
         </div>
         <div class="card-body">
             <table class="table">
@@ -15,13 +19,13 @@
                         <th>Descripción</th>
                         <th>Precio</th>
                         <th>Cantidad</th>
-                        <th>Acciones</th>
+                        <th style="text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if productos|length == 0 %}
                     <tr>
-                        <td colspan="6">No hay funciones disponibles en MySQL.</td>
+                        <td colspan="6" style="text-align: center;">No hay funciones disponibles</td>
                     </tr>
                     {% else %}
                         {% for producto in productos %}
@@ -31,9 +35,19 @@
                             <td>{{ producto.descripcion }}</td>
                             <td>{{ producto.mostrar_precio() }}</td>
                             <td>{{ producto.cantidad }}</td>
-                            <td>
-                                <a href="{{url_for('producto_editar', id=producto.id) }}">Editar</a>
-                                <a href="{{url_for('producto_eliminar', id=producto.id)}}">Eliminar</a>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <a href="{{url_for('producto_editar', id=producto.id) }}" 
+                                   class="btn-editar" 
+                                   title="Editar película">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                
+                                <a href="{{url_for('producto_eliminar', id=producto.id)}}" 
+                                   class="btn-eliminar" 
+                                   title="Eliminar función"
+                                   onclick="return confirm('¿Estás seguro de que deseas eliminar esta función de la cartelera?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
