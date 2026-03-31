@@ -87,6 +87,71 @@ main {
     margin: 0 auto;
 }
 
+.hero {
+    display: grid;
+    justify-items: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 32px;
+}
+
+.hero-logo {
+    width: min(100%, 360px);
+    padding: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+    background: linear-gradient(180deg, rgba(93, 199, 255, 0.18), rgba(255, 255, 255, 0.06));
+    border-radius: 28px;
+}
+
+.hero-logo img {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.22));
+}
+
+.logo-name {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 800;
+    text-align: center;
+}
+
+.logo-text {
+    margin: 0;
+    color: #d5f6ff;
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.hero-copy {
+    display: none;
+}
+
+.hero-copy h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    color: #ffffff;
+}
+
+.hero-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
 .flash-messages {
     display: grid;
     gap: 0.85rem;
@@ -106,17 +171,6 @@ main {
 .flash.warning { background: rgba(255, 170, 70, 0.14); border-color: rgba(255, 170, 70, 0.24); }
 .flash.info { background: rgba(95, 197, 255, 0.1); border-color: rgba(95, 197, 255, 0.2); }
 
-section.auth-form,
-.card,
-table,
-.boleto-card,
-.product-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    backdrop-filter: blur(12px);
-    box-shadow: var(--shadow);
-}
 
 .card {
     padding: 24px;
@@ -165,12 +219,6 @@ table,
 
 .table td > a + a {
     margin-left: 0.9rem;
-}
-
-section.auth-form {
-    max-width: 380px;
-    margin: 0 auto 32px;
-    padding: 24px;
 }
 
 .auth-form h2 {
@@ -317,4 +365,135 @@ footer {
     section.auth-form {
         padding: 24px;
     }
+}
+/* --- ESTILOS DEL LOGO EN EL ENCABEZADO --- */
+.logo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px; /* Espacio entre el logo y el texto */
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 60px; /* Aquí controlamos que el logo no sea gigante */
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Ajuste para que el texto de bienvenida se vea bien */
+.hero-bienvenida {
+    text-align: center;
+    max-width: 600px;
+    padding: 20px 0;
+}
+
+.hero-bienvenida h2 {
+    color: #ffffff;
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.hero-bienvenida p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* --- ESTILOS DE LA CARTELERA DESTACADA --- */
+.estrenos-container {
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
+
+.titulo-seccion {
+    color: #ffffff;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: 0.1em;
+}
+
+
+.grid-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 0 15px;
+}
+
+
+.pelicula-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.pelicula-card:hover {
+    transform: translateY(-8px);
+}
+
+
+.poster-placeholder {
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Espaciado de los textos debajo del póster */
+.pelicula-info {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pelicula-info h3 {
+    margin: 0 0 10px 0;
+    color: #ffffff;
+    font-size: 1.4rem;
+}
+
+.pelicula-info .genero {
+    color: #a2abc4;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* --- FORMULARIOS SIN CAJA VISIBLE --- */
+.formulario-invisible {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+.formulario-invisible h2 {
+    color: #ffffff;
+    margin-bottom: 25px;
+    font-size: 2rem;
+}
+/* Para editar películas, funciones, boletos (ANCHO) */
+.contenedor-formulario {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Para Login y Registro (ANGOSTO) */
+.contenedor-login {
+    max-width: 400px; /* Tamaño ideal para un login */
+    margin: 60px auto;
+    padding: 0 20px;
 }

@@ -3,28 +3,29 @@
 {% block title %}Formulario de Boleto{% endblock %}
 
 {% block content %}
-    <h2>{{ titulo }}</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.pelicula.label }}<br>
-            {{ form.pelicula() }}
-        </p>
-        <p>
-            {{ form.codigo_sala.label }}<br>
-            {{ form.codigo_sala() }}
-        </p>
-        <p>
-            {{ form.butaca.label }}<br>
-            {{ form.butaca() }}
-        </p>
-        <p>
-            {{ form.hora_funcion.label }}<br>
-            {{ form.hora_funcion() }}
-        </p>
-        <p>
-            {{ form.submit(value='Guardar boleto') }}
-            <a href="{{ url_for('boleteria') }}">Cancelar</a>
-        </p>
-    </form>
+    <div class="formulario-invisible">
+        <h2>{{ titulo }}</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.pelicula.label }}
+                {{ form.pelicula() }}
+            </div>
+            <div class="form-group">
+                {{ form.codigo_sala.label }}
+                {{ form.codigo_sala() }}
+            </div>
+            <div class="form-group">
+                {{ form.butaca.label }}
+                {{ form.butaca() }}
+            </div>
+            <div class="form-group">
+                {{ form.hora_funcion.label }}
+                {{ form.hora_funcion() }}
+            </div>
+            
+            <button type="submit" class="btn-cimazon" style="width: 100%; margin-top: 15px;">Guardar boleto</button>
+        </form>
+        <a href="{{ url_for('boleteria') }}" class="link-cancelar">Cancelar</a>
+    </div>
 {% endblock %}

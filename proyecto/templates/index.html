@@ -3,6 +3,60 @@
 {% block title %} Inicio - Cimazon {% endblock %}
 
 {% block content %}
-    <h2>Bienvenidos a Cimazon</h2>
-    <p>La mejor experiencia de cine en línea para comprar tus boletos.</p>
-{% endblock %}
+
+    {% if current_user.is_authenticated %}
+        
+        <section class="card">
+            <div class="card-header">
+                <h2>¡Qué gusto verte, {{ current_user.nombre }}!</h2>
+            </div>
+            <div class="card-body">
+                <p>Bienvenido a tu campamento base. Explora las funciones disponibles, asegura tus boletos y prepara tus snacks para la próxima aventura.</p>
+            </div>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="{{ url_for('productos') }}" class="btn-cimazon">Ver Funciones</a>
+                </div>
+        </section>
+
+    {% else %}
+
+    <section class="card">
+        <div class="card-header">
+            <h2>Bienvenido a Cimazon</h2>
+        </div>
+        <div class="card-body">
+            <p>En Cimazon, nos dedicamos a ofrecer la mejor experiencia de compra en línea. Explora nuestras categorías y encuentra los productos que necesitas.</p>
+        </div>
+    </section>
+    
+
+    <section class="estrenos-container">
+        <h2 class="titulo-seccion">Cartelera Destacada</h2>
+        
+        <div class="grid-tarjetas">
+            <div class="pelicula-card">
+                <img src="{{ url_for('static', filename='poster1.jpg') }}" alt="Póster Yasuní" class="pelicula-img">
+                <div class="pelicula-info">
+                    <h3>Interestellar</h3>
+                    <p class="genero">Drama / Ciencia ficción</p>
+                </div>
+            </div>
+
+            <div class="pelicula-card">
+                <img src="{{ url_for('static', filename='poster2.jpg') }}" alt="Póster Cuyabeno" class="pelicula-img">
+                <div class="pelicula-info">
+                    <h3>Avengers</h3>
+                    <p class="genero">Superhéroe / Acción</p>
+                </div>
+            </div>
+
+            <div class="pelicula-card">
+                <img src="{{ url_for('static', filename='poster3.jpg') }}" alt="Póster Río" class="pelicula-img">
+                <div class="pelicula-info">
+                    <h3>Origen</h3>
+                    <p class="genero">Ficción / Aventura</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %} {% endblock %}

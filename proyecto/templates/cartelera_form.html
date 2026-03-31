@@ -3,27 +3,39 @@
 {% block title %} Página de cartelera {% endblock %}
 
 {% block content %}
-    <h2>{{ titulo or 'Funciones' }}</h2>
-    <form method="POST">
-        {{form.hidden_tag()}}
-        <p>
-            {{form.nombre.label}}<br>
-            {{form.nombre()}}
-        </p>
-        <p>
-            {{form.descripcion.label}}<br>
-            {{form.descripcion()}}
-        </p>
-        <p>
-            {{form.cantidad.label}}<br>
-            {{form.cantidad()}}
-        </p>
-        <p>
-            {{form.precio.label}}<br>
-            {{form.precio()}}
-        </p>
-        <p>
-            {{form.submit()}}
-        </p>
-    </form>
+    <div class="formulario-invisible">
+        
+        <h2>{{ titulo }}</h2>
+        
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.nombre.label }}
+                {{ form.nombre() }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.descripcion.label }}
+                {{ form.descripcion() }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.cantidad.label }}
+                {{ form.cantidad() }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.precio.label }}
+                {{ form.precio() }}
+            </div>
+            
+            <div class="form-group" style="margin-top: 15px;">
+                {{ form.submit(class="btn-cimazon", style="width: 100%;") }}
+            </div>
+            
+        </form>
+        
+        <a href="{{ url_for('cartelera') }}" class="link-cancelar">Cancelar</a>
+    </div>
 {% endblock %}

@@ -3,29 +3,39 @@
 {% block title %} {{ titulo }} {% endblock %}
 
 {% block content %}
-    <section class="auth-form">
+    <div class="formulario-invisible">
+        
         <h2>{{ titulo }}</h2>
+        
         <form method="POST">
             {{ form.hidden_tag() }}
+            
             <div class="form-group">
                 {{ form.descripcion.label }}
-                {{ form.descripcion(class="form-control") }}
+                {{ form.descripcion() }}
             </div>
+            
             <div class="form-group">
                 {{ form.fecha_hora.label }}
-                {{ form.fecha_hora(class="form-control") }}
+                {{ form.fecha_hora() }}
             </div>
+            
             <div class="form-group">
                 {{ form.total.label }}
-                {{ form.total(class="form-control") }}
+                {{ form.total() }}
             </div>
+            
             <div class="form-group">
                 {{ form.metodo_pago.label }}
-                {{ form.metodo_pago(class="form-control") }}
+                {{ form.metodo_pago() }}
             </div>
-            <div class="form-group">
-                {{ form.submit(class="btn-cimazon") }}
+            
+            <div class="form-group" style="margin-top: 15px;">
+                {{ form.submit(class="btn-cimazon", style="width: 100%;") }}
             </div>
         </form>
-    </section>
+        
+        <a href="{{ url_for('funciones') }}" class="link-cancelar">Cancelar</a>
+        
+    </div>
 {% endblock %}
