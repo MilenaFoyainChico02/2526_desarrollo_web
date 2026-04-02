@@ -527,3 +527,22 @@ footer {
     text-shadow: 0 0 10px rgba(255, 95, 95, 0.6);
     text-decoration: underline;
 }
+
+/* Botón guardar cambios */
+.btn-guardar,
+input[type="submit"].btn-guardar {
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    border: none !important;
+    width: auto !important;
+    display: inline-flex !important;
+}
+
+.btn-guardar:hover,
+input[type="submit"].btn-guardar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
