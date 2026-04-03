@@ -596,3 +596,23 @@ nav a.btn-login:hover {
     transform: scale(1.2);
     color: #ffffff !important;
 }
+
+
+.btn-new-icon {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent); 
+    font-size: 2.2rem; 
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.btn-new-icon:hover {
+    color: #ffffff; 
+    transform: scale(1.15); 
+    text-shadow: 0 0 15px rgba(93, 199, 255, 0.6); 
+}
