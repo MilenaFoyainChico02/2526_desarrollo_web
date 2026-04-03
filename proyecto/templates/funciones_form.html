@@ -3,7 +3,7 @@
 {% block title %} {{ titulo }} {% endblock %}
 
 {% block content %}
-    <div class="formulario-invisible">
+    <div class="contenedor-formulario">
         
         <h2>{{ titulo }}</h2>
         
@@ -30,12 +30,18 @@
                 {{ form.metodo_pago() }}
             </div>
             
-            <div class="form-group" style="margin-top: 15px;">
-                {{ form.submit(class="btn-guardar", style="width: auto;") }}
+            <div class="ticket-actions">
+                
+                <button type="submit" class="btn-icono-form btn-guardar-check" title="Guardar Función">
+                    <i class="bi bi-check-circle-fill"></i>
+                </button>
+
+                <a href="{{ url_for('funciones') }}" class="btn-icono-form btn-cancelar-x" title="Cancelar">
+                    <i class="bi bi-x-circle-fill"></i>
+                </a>
+
             </div>
         </form>
-        
-        <a href="{{ url_for('funciones') }}" class="link-cancelar">Cancelar</a>
         
     </div>
 {% endblock %}

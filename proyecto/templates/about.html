@@ -1,63 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %} Acerca de - Cimazon {% endblock %}
+{% block title %} Acerca de - Cimazon System {% endblock %}
 
 {% block content %}
-    <section class="card" style="text-align: center; margin-bottom: 40px;">
-        <div class="card-header" style="justify-content: center;">
-            <h2 style="color: #4CAF50;">Nuestra historia en la Amazonía</h2>
-        </div>
-        <div class="card-body">
-            <p style="font-size: 1.15rem; max-width: 800px; margin: 0 auto; line-height: 1.8;">
-                Cimazon es mucho más que un lugar para ver películas. Nace de la idea de fusionar la magia del cine 
-                con el espíritu indomable de la Amazonía. Cada función es una expedición hacia lo desconocido, 
-                diseñada para que nuestros visitantes vivan historias tan inmensas desde la Amazonía.
-            </p>
-        </div>
-    </section>
-
-    <div class="grid-tarjetas" style="margin-bottom: 40px;">
-        <section class="card" style="margin-bottom: 0;">
-            <div class="card-header">
-                <h3>Nuestra Misión</h3>
-            </div>
-            <div class="card-body">
-                <p style="color: var(--muted);">
-                    Ofrecer una experiencia de entretenimiento inmersiva y de alta calidad, brindando a cada explorador
-                     la oportunidad de sumergirse en historias cautivadoras mientras disfruta de 
-                    las mejores comodidades y de la tecnología audiovisual de punta que ofrece Cimazon.
-                </p>
-            </div>
-        </section>
-
-        <section class="card" style="margin-bottom: 0;">
-            <div class="card-header">
-                <h3>Nuestra Visión</h3>
-            </div>
-            <div class="card-body">
-                <p style="color: var(--muted);">
-                    Ser el punto de encuentro cultural y de entretenimiento líder, destacando por nuestra identidad única 
-                    y convirtiendo cada visita al cine en una experiencia memorable y espectacular.
-                </p>
-            </div>
-        </section>
+<section class="contenedor-formulario" style="max-width: 900px;">
+    
+    <div style="text-align: center; margin-bottom: 50px;">
+        <h1 style="font-size: 3rem; letter-spacing: 5px; color: #ffffff;">SISTEMA CIMAZON</h1>
+        <p style="color: var(--accent); font-weight: bold; text-transform: uppercase;">Arquitectura de Gestión y Control de Activos</p>
     </div>
-    <section class="card" style="text-align: center; margin-top: 40px;">
-        <div class="card-header" style="justify-content: center;">
 
-            <h3>Únete a nuestra comunidad digital</h3>
-        </div>
-        <div class="card-body">
-            <p style="color: var(--muted); margin-bottom: 25px;">
-                Síguenos como @Cimazon en todas nuestras redes y sé el primero en enterarte de los últimos estrenos, promociones y eventos exclusivos.
-            </p>
-            
-            <div class="redes-sociales">
-                <a href="#" class="icono-red"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="icono-red"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="icono-red"><i class="bi bi-tiktok"></i></a>
-                <a href="#" class="icono-red"><i class="bi bi-twitter-x"></i></a>
+    <div class="card" style="padding: 30px; line-height: 1.8;">
+        <h3 style="color: var(--accent);"><i class="bi bi-info-circle"></i> ¿Qué es Cimazon IMS?</h3>
+        <p>
+            Cimazon es una solución integral de Inventory Management System (IMS) diseñada específicamente para ecosistemas cinematográficos de alta demanda. Nuestro sistema optimiza la cadena de suministro, desde el registro de funciones hasta la auditoría final de boletería, garantizando la integridad de los datos en cada transacción.
+        </p>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
+
+        <div class="grid-tarjetas" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div style="text-align: center;">
+                <i class="bi bi-cpu" style="font-size: 2rem; color: #ffcc00;"></i>
+                <h4 style="margin-top: 10px;">Robustez</h4>
+                <p style="font-size: 0.9rem; color: var(--muted);">Desarrollado sobre Python y Flask con persistencia en MySQL.</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="bi bi-shield-check" style="font-size: 2rem; color: #50fa7b;"></i>
+                <h4 style="margin-top: 10px;">Seguridad</h4>
+                <p style="font-size: 0.9rem; color: var(--muted);">Protocolos de autenticación para acceso restringido a administradores.</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="bi bi-lightning-charge" style="font-size: 2rem; color: var(--accent);"></i>
+                <h4 style="margin-top: 10px;">Velocidad</h4>
+                <p style="font-size: 0.9rem; color: var(--muted);">Interfaz minimalista optimizada para operaciones logísticas rápidas.</p>
             </div>
         </div>
-    </section>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+            <h4 style="color: #ffffff; margin-bottom: 10px;">Nuestra Visión</h4>
+            <p style="font-size: 0.95rem; color: var(--muted);">
+                Convertir la complejidad de la selva administrativa en un flujo de datos claro, preciso y escalable, permitiendo que Cimazon sea líder en gestión de activos digitales y físicos.
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('inicio') }}" class="btn-cimazon" style="text-decoration: none;">
+            <i class="bi bi-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+
+</section>
 {% endblock %}

@@ -1,24 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Iniciar sesión{% endblock %}
+{% block title %}Iniciar sesión - Cimazon{% endblock %}
 
 {% block content %}
-    <section class="contenedor-login">
-        <h2>Iniciar sesión</h2>
+<div class="main-login-container">
+    
+    <section class="contenedor-login-card">
+        
+        <div class="login-header">
+            <i class="bi bi-shield-lock"></i>
+            <h2>Iniciar sesión</h2>
+            <p>Acceso restringido a administradores</p>
+        </div>
+
         <form method="POST">
             {{ form.hidden_tag() }}
+            
             <div class="form-group">
                 {{ form.email.label }}
-                {{ form.email(class="form-control") }}
+                {{ form.email(class="form-control", placeholder="ejemplo@correo.com") }}
             </div>
+            
             <div class="form-group">
                 {{ form.password.label }}
-                {{ form.password(class="form-control") }}
+                {{ form.password(class="form-control", placeholder="••••••••") }}
             </div>
-            <div class="form-group">
-                {{ form.submit(class="btn") }}
+            
+            <div class="form-group" style="margin-top: 25px;">
+                {{ form.submit(class="btn-cimazon", style="width: 100%;") }}
             </div>
         </form>
-        <p>¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
+
+        <div class="login-footer">
+            <p>¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
+        </div>
+        
     </section>
+</div>
 {% endblock %}

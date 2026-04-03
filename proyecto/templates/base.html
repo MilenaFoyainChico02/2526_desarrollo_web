@@ -22,9 +22,9 @@
                     <li><a href="{{ url_for('productos') }}">Funciones</a></li>
                     <li><a href="{{ url_for('funciones') }}">Compras</a></li>
                     <li><a href="{{ url_for('boleteria') }}">Boletos</a></li>
-                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
+                    <li><a href="{{ url_for('login') }}" class="btn-login"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</a></li>
                 {% endif %}
             </ul>
         </nav>

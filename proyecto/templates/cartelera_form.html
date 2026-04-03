@@ -3,7 +3,7 @@
 {% block title %} Página de cartelera {% endblock %}
 
 {% block content %}
-    <div class="formulario-invisible">
+    <div class="contenedor-formulario">
         
         <h2>{{ titulo }}</h2>
         
@@ -30,12 +30,18 @@
                 {{ form.precio() }}
             </div>
             
-            <div class="form-group" style="margin-top: 15px;">
-                {{ form.submit(class="btn-guardar", style="width: auto;") }}
+            <div class="ticket-actions">
+                
+                <button type="submit" class="btn-icono-form btn-guardar-check" title="Guardar Película">
+                    <i class="bi bi-check-circle-fill"></i>
+                </button>
+
+                <a href="{{ url_for('productos') }}" class="btn-icono-form btn-cancelar-x" title="Cancelar">
+                    <i class="bi bi-x-circle-fill"></i>
+                </a>
+
             </div>
             
         </form>
-        
-        <a href="{{ url_for('funciones_mysql') }}" class="link-cancelar">Cancelar</a>
     </div>
 {% endblock %}

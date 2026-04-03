@@ -62,6 +62,7 @@ nav ul.menu-vertical {
     margin: 0;
     padding: 0;
     display: flex;
+    align-items: center; 
     flex-wrap: wrap;
     gap: 0.85rem;
     list-style: none;
@@ -73,6 +74,8 @@ nav a {
     text-decoration: none;
     padding: 10px 14px;
     border-radius: 999px;
+    display: inline-flex; 
+    align-items: center;  
     transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -278,6 +281,7 @@ input[type='submit'] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 10px; 
     padding: 14px 24px;
     border-radius: 999px;
     border: 1px solid transparent;
@@ -366,23 +370,23 @@ footer {
         padding: 24px;
     }
 }
-/* --- ESTILOS DEL LOGO EN EL ENCABEZADO --- */
+
 .logo-container {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 15px; /* Espacio entre el logo y el texto */
+    gap: 15px; 
     text-decoration: none;
 }
 
 .logo-img {
-    height: 60px; /* Aquí controlamos que el logo no sea gigante */
+    height: 60px; 
     width: auto;
     display: block;
     object-fit: contain;
 }
 
-/* Ajuste para que el texto de bienvenida se vea bien */
+
 .hero-bienvenida {
     text-align: center;
     max-width: 600px;
@@ -403,21 +407,6 @@ footer {
     line-height: 1.6;
 }
 
-/* --- ESTILOS DE LA CARTELERA DESTACADA --- */
-.estrenos-container {
-    margin-top: 40px;
-    margin-bottom: 60px;
-}
-
-.titulo-seccion {
-    color: #ffffff;
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 30px;
-    letter-spacing: 0.1em;
-}
-
-
 .grid-tarjetas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -425,54 +414,6 @@ footer {
     padding: 0 15px;
 }
 
-
-.pelicula-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
-    overflow: hidden;
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.pelicula-card:hover {
-    transform: translateY(-8px);
-}
-
-
-.poster-placeholder {
-    height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.7);
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-/* Espaciado de los textos debajo del póster */
-.pelicula-info {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-}
-
-.pelicula-info h3 {
-    margin: 0 0 10px 0;
-    color: #ffffff;
-    font-size: 1.4rem;
-}
-
-.pelicula-info .genero {
-    color: #a2abc4;
-    font-size: 0.95rem;
-    margin: 0;
-}
-
-/* --- FORMULARIOS SIN CAJA VISIBLE --- */
 .formulario-invisible {
     max-width: 700px;
     margin: 40px auto;
@@ -490,15 +431,6 @@ footer {
     margin: 40px auto;
     padding: 0 20px;
 }
-
-
-.contenedor-login {
-    max-width: 400px; 
-    margin: 60px auto;
-    padding: 0 20px;
-}
-/* --- BOTONES DE ACCIÓN EN TABLAS --- */
-
 
 .btn-editar {
     color: #ffcc00 !important; 
@@ -545,4 +477,122 @@ input[type="submit"].btn-guardar {
 input[type="submit"].btn-guardar:hover {
     transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+
+
+
+nav a.btn-logout {
+    color: #ff5f5f !important;
+    gap: 8px;
+}
+nav a.btn-logout:hover {
+    background-color: rgba(255, 95, 95, 0.15) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+
+nav a.btn-login {
+    color: #50fa7b !important;
+    gap: 8px;
+}
+nav a.btn-login:hover {
+    background-color: rgba(80, 250, 123, 0.15) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+/* contenedor del formulario de login */
+.main-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+}
+
+.contenedor-login-card {
+    background-color: rgba(17, 22, 31, 0.95);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid rgba(93, 199, 255, 0.15);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header i {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.login-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #ffffff;
+}
+
+.login-header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.login-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.login-footer a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Iconos de acción en formularios */
+.ticket-actions {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-top: 25px;
+}
+
+.btn-icono-form {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 2.5rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.btn-guardar-check {
+    color: #50fa7b !important;
+}
+
+.btn-cancelar-x {
+    color: #ff5f5f !important;
+}
+
+.btn-icono-form:hover {
+    transform: scale(1.2);
+    color: #ffffff !important;
 }

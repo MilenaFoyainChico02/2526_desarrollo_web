@@ -8,55 +8,57 @@
         
         <section class="card">
             <div class="card-header">
-                <h2>¡Qué gusto verte, {{ current_user.nombre }}!</h2>
+                <h2><i class="bi bi-speedometer2" style="color: var(--accent);"></i> Panel de Control - Administrador {{ current_user.nombre }}</h2>
             </div>
             <div class="card-body">
-                <p>Bienvenido a tu campamento base. Explora las funciones disponibles, asegura tus boletos y prepara tus snacks para la próxima aventura.</p>
-            </div>
-            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
-                    <a href="{{ url_for('productos') }}" class="btn-cimazon">Ver Funciones</a>
+                <p style="color: var(--muted); font-size: 1.1rem;">
+                    Bienvenido al Sistema Centralizado de Inventarios Cimazon. El servidor está operando con normalidad. 
+                    Selecciona un módulo para comenzar la gestión de activos, actualización de stock y control logístico.
+                </p>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
+                    <a href="{{ url_for('productos') }}" class="btn-cimazon">
+                        <i class="bi bi-film"></i> Gestión de Películas
+                    </a>
+                    <a href="{{ url_for('funciones') }}" class="btn-cimazon">
+                        <i class="bi bi-calendar-event"></i> Control de Funciones
+                    </a>
+                    <a href="{{ url_for('boleteria') }}" class="btn-cimazon">
+                        <i class="bi bi-ticket-detailed"></i> Auditoría de Boletos
+                    </a>
                 </div>
+            </div>
         </section>
 
     {% else %}
 
-    <section class="card">
-        <div class="card-header">
-            <h2>Bienvenido a Cimazon</h2>
+        <div style="height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            
+            <div class="hero-logo" style="background: none; border: none; box-shadow: none; margin-bottom: 20px; width: 100%; text-align: center;">
+                
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.3em; text-indent: 0.3em; margin: 0; color: #ffffff; width: 100%;">
+                    CIMAZON
+                </h1>
+                
+                <p style="color: var(--accent); letter-spacing: 5px; text-indent: 5px; font-weight: 800; text-transform: uppercase; margin-top: 10px; width: 100%;">
+                    Inventory Management System
+                </p>
+
+            </div>
+
+            <div style="max-width: 500px; margin-bottom: 40px; padding: 0 15px;">
+                <p style="color: var(--muted); font-size: 1.1rem; line-height: 1.6;">
+                    Plataforma centralizada para el control de activos, stock y logística cinematográfica. 
+                    El acceso está restringido a personal autorizado.
+                </p>
+            </div>
+
+            <a href="{{ url_for('login') }}" class="btn-cimazon" style="padding: 18px 50px; font-size: 1.2rem; display: flex; align-items: center; gap: 15px; border-radius: 12px; box-shadow: 0 0 30px rgba(93, 199, 255, 0.2); text-decoration: none;">
+                <i class="bi bi-shield-lock-fill"></i> INGRESAR AL SISTEMA
+            </a>
+
         </div>
-        <div class="card-body">
-            <p>En Cimazon, nos dedicamos a ofrecer la mejor experiencia de compra en línea. Explora nuestras categorías y encuentra los productos que necesitas.</p>
-        </div>
-    </section>
+
+    {% endif %} 
     
-
-    <section class="estrenos-container">
-        <h2 class="titulo-seccion">Cartelera Destacada</h2>
-        
-        <div class="grid-tarjetas">
-            <div class="pelicula-card">
-                <img src="{{ url_for('static', filename='poster1.jpg') }}" alt="Póster Yasuní" class="pelicula-img">
-                <div class="pelicula-info">
-                    <h3>Interestellar</h3>
-                    <p class="genero">Drama / Ciencia ficción</p>
-                </div>
-            </div>
-
-            <div class="pelicula-card">
-                <img src="{{ url_for('static', filename='poster2.jpg') }}" alt="Póster Cuyabeno" class="pelicula-img">
-                <div class="pelicula-info">
-                    <h3>Avengers</h3>
-                    <p class="genero">Superhéroe / Acción</p>
-                </div>
-            </div>
-
-            <div class="pelicula-card">
-                <img src="{{ url_for('static', filename='poster3.jpg') }}" alt="Póster Río" class="pelicula-img">
-                <div class="pelicula-info">
-                    <h3>Origen</h3>
-                    <p class="genero">Ficción / Aventura</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    {% endif %} {% endblock %}
+{% endblock %}

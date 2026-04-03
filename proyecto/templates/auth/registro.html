@@ -1,32 +1,50 @@
 {% extends 'base.html' %}
 
-{% block title %}Registro{% endblock %}
+{% block title %}Registro - Cimazon{% endblock %}
 
 {% block content %}
-    <section class="contenedor-login">
-        <h2>Crear una cuenta</h2>
+<div class="main-login-container">
+    
+    <section class="contenedor-login-card">
+        
+        <div class="login-header">
+            <i class="bi bi-person-badge"></i>
+            <h2>Crear una cuenta</h2>
+            <p>Registro de nuevo administrador del sistema</p>
+        </div>
+
         <form method="POST">
             {{ form.hidden_tag() }}
+            
             <div class="form-group">
                 {{ form.nombre.label }}
-                {{ form.nombre(class="form-control") }}
+                {{ form.nombre(class="form-control", placeholder="Ingresa tu nombre") }}
             </div>
+            
             <div class="form-group">
                 {{ form.email.label }}
-                {{ form.email(class="form-control") }}
+                {{ form.email(class="form-control", placeholder="ejemplo@correo.com") }}
             </div>
+            
             <div class="form-group">
                 {{ form.password.label }}
-                {{ form.password(class="form-control") }}
+                {{ form.password(class="form-control", placeholder="••••••••") }}
             </div>
+            
             <div class="form-group">
                 {{ form.confirm_password.label }}
-                {{ form.confirm_password(class="form-control") }}
+                {{ form.confirm_password(class="form-control", placeholder="••••••••") }}
             </div>
-            <div class="form-group">
-                {{ form.submit(class="btn") }}
+            
+            <div class="form-group" style="margin-top: 25px;">
+                {{ form.submit(class="btn-cimazon", style="width: 100%;") }}
             </div>
         </form>
-        <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión aquí</a></p>
+
+        <div class="login-footer">
+            <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión aquí</a></p>
+        </div>
+        
     </section>
+</div>
 {% endblock %}
