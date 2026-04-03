@@ -122,7 +122,7 @@ def login():
 def logout():
     logout_user()
     flash('Sesión cerrada correctamente', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('inicio'))
 
 # ruta de exportar PDF 
 @app.route('/exportar/pdf')
