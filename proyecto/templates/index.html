@@ -13,7 +13,7 @@
             <div class="card-body">
                 <p style="color: var(--muted); font-size: 1.1rem;">
                     Bienvenido al sistema centralizado de inventarios Cimazon. El servidor está operando con normalidad. 
-                    Selecciona una herramienta para exportar reportes, gestionar la persistencia o revisar la conexión.
+                    Selecciona una herramienta para exportar reportes, gestionar la persistencia o revisar los usuarios registrados.
                 </p>
                 
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
@@ -38,7 +38,7 @@
 
         <section class="card">
             <div class="card-header">
-                <h2><i class="bi bi-person-circle" style="color: var(--accent);"></i> Bienvenido, {{ current_user.nombre }}</h2>
+                <h2><i class="bi bi-person-circle" style="color: var(--accent);"></i> Bienvenido/a, {{ current_user.nombre }}</h2>
             </div>
             <div class="card-body" style="text-align: center; padding: 40px;">
                 <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 30px;">
@@ -46,7 +46,7 @@
                 </p>
                 
                 <a href="{{ url_for('productos') }}" class="btn-cimazon" style="padding: 15px 30px; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 10px; border-radius: 8px; text-decoration: none;">
-                    <i class="bi bi-film"></i> Ver Cartelera
+                    <i class="bi bi-film"></i> Ver cartelera
                 </a>
             </div>
         </section>

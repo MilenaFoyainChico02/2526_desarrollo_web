@@ -21,12 +21,12 @@
                 {% if current_user.is_authenticated %}
                     {% if current_user.rol == 'admin' %}
                         <li><a href="{{ url_for('inicio') }}">Panel de control</a></li> 
-                        <li><a href="{{ url_for('productos') }}">Cartelera (Admin)</a></li>
-                        <li><a href="{{ url_for('funciones') }}">Ventas y Funciones</a></li>
-                        <li><a href="{{ url_for('boleteria') }}">Gestión de Boletos</a></li>
+                        <li><a href="{{ url_for('productos') }}">Cartelera</a></li>
+                        <li><a href="{{ url_for('funciones') }}">Ventas y funciones</a></li>
+                        <li><a href="{{ url_for('boleteria') }}">Gestión de boletos</a></li>
                     {% else %}
                         <li><a href="{{ url_for('productos') }}">Cartelera</a></li>
-                        <li><a href="{{ url_for('boleteria_nuevo') }}">Comprar Boleto</a></li>
+                        <li><a href="{{ url_for('boleteria_nuevo') }}">Comprar boleto</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('logout') }}" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
                 {% else %}
