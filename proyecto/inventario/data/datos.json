@@ -28,5 +28,11 @@
         "descripcion": "cuarto semestre",
         "cantidad": "10",
         "precio": "3"
+    },
+    {
+        "nombre": "Origen",
+        "descripcion": "Película sobre sueños dentro de sueños",
+        "cantidad": "50",
+        "precio": "5"
     }
 ]

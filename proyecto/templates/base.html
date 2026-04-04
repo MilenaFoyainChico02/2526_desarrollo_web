@@ -19,6 +19,7 @@
                     <li><a href="{{ url_for('about') }}">Acerca de Cimazon</a></li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('inicio') }}">Panel de control</a></li> 
                     <li><a href="{{ url_for('productos') }}">Funciones</a></li>
                     <li><a href="{{ url_for('funciones') }}">Compras</a></li>
                     <li><a href="{{ url_for('boleteria') }}">Boletos</a></li>

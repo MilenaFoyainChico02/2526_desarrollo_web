@@ -1,9 +1,7 @@
-# coneción con SQLite
 import sqlite3
-from sqlite3 import Error
 from pathlib import Path
 
-db_path = Path(__file__).parent /"data" / 'inventario.db'
+db_path = Path(__file__).parent / "data" / 'inventario.db'
 
 def get_connection():
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -13,13 +11,15 @@ def get_connection():
 
 def init_db(): 
     with get_connection() as conn:
+        # Creamos la tabla 'funcion' según tu diagrama
         conn.execute('''
-            CREATE TABLE IF NOT EXISTS productos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL,
-                descripcion TEXT, -- AGREGADO: faltaba esta columna
-                cantidad INTEGER NOT NULL,
-                precio REAL NOT NULL
+            CREATE TABLE IF NOT EXISTS funcion (
+                id_funcion INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_usuario INTEGER NOT NULL,
+                descripcion TEXT,
+                fecha_hora TEXT,
+                total REAL,
+                metodo_pago TEXT
             )
         ''')
         conn.commit()

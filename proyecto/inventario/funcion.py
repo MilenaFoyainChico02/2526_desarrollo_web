@@ -1,26 +1,28 @@
-# clase funciones
 class funciones:
-    def __init__(self, id, nombre, descripcion, cantidad, precio):
-        self.id = id
-        self.nombre = nombre
+    def __init__(self, id_funcion, id_usuario, descripcion, fecha_hora, total, metodo_pago):
+        self.id_funcion = id_funcion
+        self.id_usuario = id_usuario
         self.descripcion = descripcion
-        self.cantidad = cantidad
-        self.precio = precio
+        self.fecha_hora = fecha_hora
+        self.total = total
+        self.metodo_pago = metodo_pago
 
-    # tuple
     def to_tuple(self):
-        return (self.nombre, self.descripcion, self.cantidad, self.precio)
-    # dict
+    
+        return (self.id_funcion, self.id_usuario, self.descripcion, self.fecha_hora, self.total, self.metodo_pago)
+
     def to_dict(self):
         return {
-            'id': self.id,
-            'nombre': self.nombre,
+            'id_funcion': self.id_funcion,
+            'id_usuario': self.id_usuario,
             'descripcion': self.descripcion,
-            'cantidad': self.cantidad,
-            'precio': self.precio
+            'fecha_hora': self.fecha_hora,
+            'total': self.total,
+            'metodo_pago': self.metodo_pago
         }
-    def mostrar_precio(self):
-        return f"${self.precio:.2f}"
+
+    def mostrar_total(self):
+        return f"${self.total:.2f}"
 
 
 class Boleto:

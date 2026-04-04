@@ -1,16 +1,19 @@
 from flask import Flask, render_template, url_for, request, redirect, flash
-from form import carteleraForm, BoletoForm, FuncionForm
-from inventario.bd import init_db
-from inventario.inventario import Inventario
-from inventario.funcion import funciones as Producto, Boleto
 from flask_sqlalchemy import SQLAlchemy
-from inventario.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
-from inventario import inv_persistencia as persistencia
-from conexion.conexion import conectar
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from form import carteleraForm, BoletoForm, FuncionForm
 from forms.login_form import LoginForm
 from forms.registro_form import RegistroForm
+
+from inventario.bd import init_db
+from inventario.inventario import Inventario  
+from inventario.funcion import funciones as Producto, Boleto
+from inventario.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
+from inventario import inv_persistencia as persistencia
+
+from conexion.conexion import conectar
 from services.usuario_service import crear_tabla_usuario, obtener_usuario_por_id, obtener_usuario_por_email, registrar_usuario
 
 try:
@@ -21,6 +24,8 @@ except ImportError:
 from flask import make_response
 
 app = Flask(__name__)
+init_db()
+inventario = Inventario()
 app.config['SECRET_KEY'] = 'mi_llave_secreta'
 
 login_manager = LoginManager()
@@ -124,50 +129,71 @@ def logout():
     flash('Sesión cerrada correctamente', 'info')
     return redirect(url_for('inicio'))
 
-# ruta de exportar PDF 
 @app.route('/exportar/pdf')
 @login_required
 def exportar_pdf():
     if FPDF is None:
-        flash('La librería FPDF no está instalada. Instala el paquete fpdf y reinicia la aplicación.', 'danger')
+        flash('La librería FPDF no está instalada.', 'danger')
         return redirect(url_for('inicio'))
 
-    productos = listar_productos()
+    try:
+        conn = conectar()
+        if conn is None or not conn.is_connected():
+            flash('Conexión a la base de datos fallida', 'danger')
+            return redirect(url_for('inicio'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute('SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
+        funciones_vendidas = cursor.fetchall() # Trae los datos reales
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        flash(f'Error al cargar datos para el PDF: {e}', 'danger')
+        return redirect(url_for('inicio'))
 
     pdf = FPDF()
     pdf.add_page()
-
     pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Reporte de funciones", ln=True, align="C")
-
+    pdf.cell(0, 10, "Reporte de ventas", ln=True, align="C")
     pdf.ln(10)
 
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(20, 10, "ID", 1)
-    pdf.cell(60, 10, "Nombre", 1)
-    pdf.cell(30, 10, "Precio", 1)
-    pdf.cell(30, 10, "Cantidad", 1)
+    pdf.cell(15, 10, "ID", 1)
+    pdf.cell(65, 10, "Descripcion", 1) 
+    pdf.cell(45, 10, "Fecha y hora", 1)
+    pdf.cell(25, 10, "Total", 1)
+    pdf.cell(40, 10, "Metodo de pago", 1)
     pdf.ln()
 
     pdf.set_font("Arial", "", 10)
 
-    for p in productos:
-        pdf.cell(20, 10, str(p['id_producto']), 1)
-        pdf.cell(60, 10, p['nombre'], 1)
-        pdf.cell(30, 10, f"${p['precio']}", 1)
-        pdf.cell(30, 10, str(p['cantidad']), 1)
+    for f in funciones_vendidas:
+        pdf.cell(15, 10, str(f[0]), 1) # id_funcion
+        
+        desc = str(f[1])[:35]          # descripcion 
+        pdf.cell(65, 10, desc, 1)
+        
+        pdf.cell(45, 10, str(f[2]), 1) # fecha_hora
+        
+        # Validamos el total por si es None en la base de datos
+        total_val = float(f[3]) if f[3] is not None else 0.0
+        pdf.cell(25, 10, f"${total_val:.2f}", 1) 
+        
+        pdf.cell(40, 10, str(f[4]), 1) # metodo_pago
         pdf.ln()
 
+    # generación y descarga del PDF
     output_data = pdf.output(dest='S')
     if isinstance(output_data, str):
-        output_bytes = output_data.encode('latin-1')
+        output_bytes = output_data.encode('latin-1', 'replace') 
     elif isinstance(output_data, (bytes, bytearray)):
         output_bytes = bytes(output_data)
     else:
-        output_bytes = str(output_data).encode('latin-1')
+        output_bytes = str(output_data).encode('latin-1', 'replace')
 
     response = make_response(output_bytes)
-    response.headers.set('Content-Disposition', 'attachment', filename='productos.pdf')
+    response.headers.set('Content-Disposition', 'attachment', filename='reporte_ventas_cimazon.pdf')
     response.headers.set('Content-Type', 'application/pdf')
 
     return response
@@ -226,25 +252,26 @@ def funciones():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
+        # Pedimos los 5 datos
         cursor.execute('SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
 
-        funciones = [
-            {
+        lista_funciones = []
+        for row in rows:
+            lista_funciones.append({
                 'id_funcion': row[0],
                 'descripcion': row[1],
                 'fecha_hora': row[2],
                 'total': float(row[3]) if row[3] is not None else 0,
                 'metodo_pago': row[4]
-            }
-            for row in rows
-        ]
+            })
 
-        return render_template('funciones.html', funciones=funciones)
+        return render_template('funciones.html', funciones=lista_funciones)
+
     except Exception as e:
-        flash(f'Error al cargar funciones: {e}', 'danger')
+        flash(f'Error en el sistema: {e}', 'danger')
         return redirect(url_for('inicio'))
 
 @app.route('/funciones/nuevo', methods=['GET', 'POST'])
@@ -437,8 +464,19 @@ def funciones_mysql():
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        productos_mysql = [Producto(row[0], row[1], row[2], row[3], row[4]) for row in rows]
+        
+        productos_mysql = []
+        for row in rows:
+            productos_mysql.append({
+                'id': row[0],
+                'nombre': row[1],
+                'descripcion': row[2],
+                'cantidad': row[3],
+                'precio': float(row[4]) if row[4] is not None else 0.0
+            })
+            
         return render_template('cartelera.html', productos=productos_mysql)
+        
     except Exception as e:
         flash(f'Error al conectar a la base de datos: {e}', 'danger')
         return redirect(url_for('inicio'))

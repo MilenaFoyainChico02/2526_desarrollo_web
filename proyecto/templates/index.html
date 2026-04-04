@@ -8,26 +8,26 @@
         
         <section class="card">
             <div class="card-header">
-                <h2><i class="bi bi-speedometer2" style="color: var(--accent);"></i> Panel de Control - Administrador {{ current_user.nombre }}</h2>
+                <h2><i class="bi bi-speedometer2" style="color: var(--accent);"></i> Panel de control - Administrador {{ current_user.nombre }}</h2>
             </div>
             <div class="card-body">
                 <p style="color: var(--muted); font-size: 1.1rem;">
-                    Bienvenido al Sistema Centralizado de Inventarios Cimazon. El servidor está operando con normalidad. 
+                    Bienvenido al sistema centralizado de inventarios Cimazon. El servidor está operando con normalidad. 
                     Selecciona una herramienta para exportar reportes, gestionar la persistencia o revisar la conexión.
                 </p>
                 
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
                     
                     <a href="/exportar/pdf" class="btn-cimazon" style="background: linear-gradient(135deg, #ff5f5f, #c0392b); box-shadow: 0 10px 25px rgba(255, 95, 95, 0.2); border: none;">
-                        <i class="bi bi-file-earmark-pdf-fill"></i> Exportar Reporte PDF
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Exportar reporte PDF
                     </a>
 
                     <a href="/datos" class="btn-cimazon" style="background: linear-gradient(135deg, #ffb300, #e67e22); box-shadow: 0 10px 25px rgba(255, 179, 0, 0.2); border: none;">
-                        <i class="bi bi-folder-symlink-fill"></i> Persistencia de Datos
+                        <i class="bi bi-folder-symlink-fill"></i> Persistencia de datos
                     </a>
 
                     <a href="/conexion" class="btn-cimazon" style="background: linear-gradient(135deg, #b388ff, #8e44ad); box-shadow: 0 10px 25px rgba(179, 136, 255, 0.2); border: none;">
-                        <i class="bi bi-server"></i> Conexión DB de Usuarios
+                        <i class="bi bi-server"></i> Conexión DB de usuarios
                     </a>
 
                 </div>
