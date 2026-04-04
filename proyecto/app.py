@@ -138,7 +138,7 @@ def exportar_pdf():
     pdf.add_page()
 
     pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Reporte de Productos ", ln=True, align="C")
+    pdf.cell(0, 10, "Reporte de funciones", ln=True, align="C")
 
     pdf.ln(10)
 
