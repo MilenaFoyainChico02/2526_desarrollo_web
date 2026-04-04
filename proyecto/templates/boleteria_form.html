@@ -3,42 +3,192 @@
 {% block title %} Formulario de Boleto {% endblock %}
 
 {% block content %}
-    <div class="contenedor-formulario"> <h2>{{ titulo }}</h2>
+    <div class="contenedor-formulario comprar-boleto"> 
+        <h2>{{ titulo }}</h2>
         
         <form method="POST">
             {{ form.hidden_tag() }}
             
             <div class="form-group">
-                {{ form.pelicula.label }}
-                {{ form.pelicula() }}
+                {{ form.id_producto.label }}
+                {{ form.id_producto() }}
+            </div>
+
+            <div class="form-group">
+                {{ form.id_funcion.label }}
+                {{ form.id_funcion() }}
             </div>
             
             <div class="form-group">
+                {{ form.cantidad.label }}
+                {{ form.cantidad() }}
+            </div>
+
+            <div class="form-group" style="display: none;">
                 {{ form.codigo_sala.label }}
                 {{ form.codigo_sala() }}
             </div>
             
-            <div class="form-group">
-                {{ form.butaca.label }}
-                {{ form.butaca() }}
-            </div>
-            
-            <div class="form-group">
-                {{ form.hora_funcion.label }}
-                {{ form.hora_funcion() }}
-            </div>
-            
-            <div class="ticket-actions">
+            <div class="form-group" style="margin-top: 30px;">
+                <label style="font-size: 1.2rem; display: block; margin-bottom: 10px;">Selecciona tu Butaca</label>
+                {{ form.butaca(id="hidden_butaca", style="display:none;") }}
                 
-                <button type="submit" class="btn-icono-form btn-guardar-check" title="Guardar boleto">
-                    <i class="bi bi-check-circle"></i>
+                <div class="seat-map-container" style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+                    <div class="screen-indicator" style="text-align: center; color: #fff; margin-bottom: 30px; border-bottom: 3px solid var(--accent); padding-bottom: 8px; font-weight: 800; letter-spacing: 5px; text-transform: uppercase;">Pantalla</div>
+                    <div class="seats-grid" id="seats-grid" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; justify-items: center;">
+                        <!-- JS creates seats here -->
+                    </div>
+                    <div style="text-align: center; margin-top: 25px; color: var(--accent); font-weight: bold; background: rgba(93, 199, 255, 0.1); padding: 10px; border-radius: 8px;" id="selected_seat_display">
+                        Ninguna butaca seleccionada
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ticket-actions" style="margin-top: 30px; display: flex; gap: 15px;">
+                
+                <button type="submit" class="btn-icono-form btn-guardar-check" title="Confirmar Compra" style="flex: 2; border-radius: 8px; justify-content: center; gap: 10px;">
+                    <i class="bi bi-ticket-detailed-fill"></i> Confirmar
                 </button>
 
-                <a href="{{ url_for('boleteria') }}" class="btn-icono-form btn-cancelar-x" title="Cancelar">
-                    <i class="bi bi-x-circle"></i>
+                <a href="{% if current_user.rol == 'admin' %}{{ url_for('boleteria') }}{% else %}{{ url_for('productos') }}{% endif %}" class="btn-icono-form btn-cancelar-x" title="Cancelar" style="flex: 1; border-radius: 8px; justify-content: center;">
+                    <i class="bi bi-x-lg"></i>
                 </a>
 
             </div>
         </form>
     </div>
+
+    <style>
+        .contenedor-formulario.comprar-boleto {
+            background: rgba(30, 30, 45, 0.85); /* Darker glass background */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            max-width: 650px;
+        }
+        .contenedor-formulario.comprar-boleto h2 {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .seat {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.15) 100%);
+            border-radius: 10px 10px 6px 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .seat::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 70%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+        .seat:hover {
+            background: rgba(93, 199, 255, 0.5);
+            color: #fff;
+            transform: scale(1.1) translateY(-2px);
+            border-color: rgba(93, 199, 255, 0.6);
+        }
+        .seat.selected {
+            background: linear-gradient(135deg, #1abc9c, #27ae60);
+            color: #fff;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('seats-grid');
+            const hiddenInput = document.getElementById('hidden_butaca');
+            const display = document.getElementById('selected_seat_display');
+            const cantidadInput = document.getElementById('cantidad');
+            
+            const rows = ['A', 'B', 'C', 'D'];
+            const cols = 8;
+            
+            let selectedSeats = [];
+
+            // Initialize from hidden input if editing
+            if (hiddenInput.value) {
+                selectedSeats = hiddenInput.value.split(',').filter(s => s.trim() !== '');
+            }
+            
+            function updateDisplay() {
+                if (selectedSeats.length > 0) {
+                    display.innerText = `Butaca(s): ${selectedSeats.join(', ')}`;
+                } else {
+                    display.innerText = `Ninguna butaca seleccionada`;
+                }
+                hiddenInput.value = selectedSeats.join(',');
+            }
+
+            cantidadInput.addEventListener('change', () => {
+                const maxSeats = parseInt(cantidadInput.value, 10);
+                if (selectedSeats.length > maxSeats) {
+                    // Deselect seats if we reduced the quantity
+                    selectedSeats = selectedSeats.slice(0, maxSeats);
+                    document.querySelectorAll('.seat').forEach(el => {
+                        if (!selectedSeats.includes(el.innerText)) {
+                            el.classList.remove('selected');
+                        }
+                    });
+                    updateDisplay();
+                }
+            });
+            
+            rows.forEach(r => {
+                for(let i=1; i<=cols; i++) {
+                    const btn = document.createElement('div');
+                    btn.className = 'seat';
+                    const seatName = `${r}${i}`;
+                    btn.innerText = seatName;
+                    
+                    if (selectedSeats.includes(seatName)) {
+                        btn.classList.add('selected');
+                    }
+
+                    btn.addEventListener('click', () => {
+                        const maxSeats = parseInt(cantidadInput.value, 10);
+                        
+                        if (selectedSeats.includes(seatName)) {
+                            // Deselect
+                            selectedSeats = selectedSeats.filter(s => s !== seatName);
+                            btn.classList.remove('selected');
+                        } else {
+                            // Select if under limit
+                            if (selectedSeats.length < maxSeats) {
+                                selectedSeats.push(seatName);
+                                btn.classList.add('selected');
+                            } else {
+                                // Provide a visual cue that limit reached
+                                btn.style.transform = 'scale(0.9)';
+                                setTimeout(() => btn.style.transform = '', 150);
+                            }
+                        }
+                        updateDisplay();
+                    });
+                    grid.appendChild(btn);
+                }
+            });
+            
+            updateDisplay();
+        });
+    </script>
+
+
 {% endblock %}

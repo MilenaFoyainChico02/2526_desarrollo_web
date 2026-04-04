@@ -1,7 +1,5 @@
-# formulario de cartelera
-
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, SubmitField, IntegerField
+from wtforms import StringField, DecimalField, SubmitField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange
 
 class carteleraForm(FlaskForm):
@@ -13,10 +11,12 @@ class carteleraForm(FlaskForm):
 
 
 class BoletoForm(FlaskForm):
-    pelicula = StringField('Película', validators=[DataRequired(), Length(min=2, max=200)])
-    codigo_sala = StringField('Código de sala', validators=[DataRequired(), Length(min=1, max=50)])
-    butaca = StringField('Butaca', validators=[DataRequired(), Length(min=1, max=50)])
-    hora_funcion = StringField('Hora de la función', validators=[DataRequired(), Length(min=2, max=50)])
+    id_producto = SelectField('Película', coerce=int, validators=[DataRequired()])
+    id_funcion = SelectField('Hora de la función', coerce=int, validators=[DataRequired()])
+    cantidad = SelectField('Cantidad de boletos', choices=[(str(i), str(i)) for i in range(1, 11)], coerce=int, default=1)
+    codigo_sala = SelectField('Código de sala', choices=[('Sala 1', 'Sala 1 - Tradicional'), ('Sala 2', 'Sala 2 - Tradicional'), ('Sala 3', 'Sala 3 - 3D'), ('Sala 4D', 'Sala 4 - 4D Experiencia'), ('Sala VIP', 'Sala VIP - Lounge')], validate_choice=False)
+    butaca = StringField('Butaca', validators=[DataRequired(), Length(min=1, max=100)])
+    
     submit = SubmitField('Guardar boleto')
 
 

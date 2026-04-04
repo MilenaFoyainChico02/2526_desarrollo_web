@@ -1,13 +1,18 @@
 # clase de conexión a la base de datos my
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 def conectar():
     try:
         conexion = mysql.connector.connect(
-            host='localhost',
-            database='cimazon',
-            user='root',
-            password='Polacasj'
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'cimazon'),
+            user=os.getenv('DB_USER', 'root'),
+            password=os.getenv('DB_PASSWORD', '')
         )
         if conexion.is_connected():
             return conexion

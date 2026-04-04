@@ -1,17 +1,13 @@
 from flask import Flask, render_template, url_for, request, redirect, flash
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from functools import wraps
 from form import carteleraForm, BoletoForm, FuncionForm
 from forms.login_form import LoginForm
 from forms.registro_form import RegistroForm
 
-from inventario.bd import init_db
-from inventario.inventario import Inventario  
-from inventario.funcion import funciones as Producto, Boleto
-from inventario.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
-from inventario import inv_persistencia as persistencia
+from models.boleto import Boleto
+from services.inv_persistencia import guardar_txt, leer_txt, guardar_json, leer_json, guardar_csv, leer_csv
 
 from conexion.conexion import conectar
 from services.usuario_service import crear_tabla_usuario, obtener_usuario_por_id, obtener_usuario_por_email, registrar_usuario
@@ -24,8 +20,6 @@ except ImportError:
 from flask import make_response
 
 app = Flask(__name__)
-init_db()
-inventario = Inventario()
 app.config['SECRET_KEY'] = 'mi_llave_secreta'
 
 login_manager = LoginManager()
@@ -36,22 +30,18 @@ login_manager.login_message_category = 'warning'
 
 crear_tabla_usuario()
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///invent.db'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#db = SQLAlchemy(app)
-
-"""
-db.init_app(app)
-
-with app.app_context():
-    db.create_all()
-
-inventario = Inventario()
-inventario.cargar_desde_db()
-"""
+# Dead DB Init Block Removed
 @login_manager.user_loader
 def load_user(user_id):
     return obtener_usuario_por_id(user_id)
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.rol != 'admin':
+            flash('No tienes permisos de administrador para acceder a esta página.', 'danger')
+            return redirect(url_for('inicio'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def listar_productos():
@@ -130,7 +120,7 @@ def logout():
     return redirect(url_for('inicio'))
 
 @app.route('/exportar/pdf')
-@login_required
+@admin_required
 def exportar_pdf():
     if FPDF is None:
         flash('La librería FPDF no está instalada.', 'danger')
@@ -209,6 +199,7 @@ def about():
     return render_template('about.html')
 
 @app.route('/cartelera/nuevo', methods=['GET', 'POST'])
+@admin_required
 def cartelera_nuevo():
     form = carteleraForm()
     if form.validate_on_submit():
@@ -242,7 +233,7 @@ def cartelera_nuevo():
     return render_template('cartelera_form.html', form=form, titulo='Agregar nueva función')
 
 @app.route('/funciones')
-@login_required
+@admin_required
 def funciones():
     try:
         conn = conectar()
@@ -275,7 +266,7 @@ def funciones():
         return redirect(url_for('inicio'))
 
 @app.route('/funciones/nuevo', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def funciones_nuevo():
     form = FuncionForm()
     if form.validate_on_submit():
@@ -304,7 +295,7 @@ def funciones_nuevo():
     return render_template('funciones_form.html', form=form, titulo='Nueva función')
 
 @app.route('/funciones/editar/<int:id>', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def funciones_editar(id):
     form = FuncionForm()
     try:
@@ -349,7 +340,7 @@ def funciones_editar(id):
         return redirect(url_for('funciones'))
 
 @app.route('/funciones/eliminar/<int:id>', methods=['POST', 'GET'])
-@login_required
+@admin_required
 def funciones_eliminar(id):
     try:
         conn = conectar()
@@ -380,6 +371,7 @@ def productos():
     return redirect(url_for('funciones_mysql'))
 
 @app.route('/productos/editar/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def producto_editar(id):
     form = carteleraForm()
     try:
@@ -424,6 +416,7 @@ def producto_editar(id):
         return redirect(url_for('funciones_mysql'))
 
 @app.route('/productos/eliminar/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def producto_eliminar(id):
     try:
         conn = conectar()
@@ -492,7 +485,7 @@ def boleteria():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT * from boleto')
+        cursor.execute('SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -506,37 +499,101 @@ def boleteria():
 @app.route('/boleteria/nuevo', methods=['GET', 'POST'])
 def boleteria_nuevo():
     form = BoletoForm()
-    if form.validate_on_submit():
-        pelicula = form.pelicula.data
-        codigo_sala = form.codigo_sala.data
-        butaca = form.butaca.data
-        hora_funcion = form.hora_funcion.data
+    
+    # Populate choices before validation
+    try:
+        conn = conectar()
+        if conn and conn.is_connected():
+            cursor = conn.cursor()
+            cursor.execute('USE cimazon')
+            cursor.execute('SELECT id, nombre FROM productos')
+            productos = cursor.fetchall()
+            form.id_producto.choices = [(p[0], p[1]) for p in productos]
+            
+            cursor.execute('SELECT id_funcion, descripcion, fecha_hora FROM funcion')
+            funciones = cursor.fetchall()
+            form.id_funcion.choices = [(f[0], f"{f[1]} - {f[2]}") for f in funciones]
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        flash(f'Error al cargar formulario: {e}', 'danger')
+        return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
+    pelicula_id = request.args.get('pelicula_id', type=int)
+    if request.method == 'GET' and pelicula_id:
+        form.id_producto.data = pelicula_id
+
+    if form.validate_on_submit():
         try:
             conn = conectar()
             if conn is None or not conn.is_connected():
                 flash('Conexión a la base de datos fallida', 'danger')
-                return redirect(url_for('boleteria'))
+                return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
             cursor = conn.cursor()
             cursor.execute('USE cimazon')
+
+            # Check stock and get pelicula string
+            cursor.execute('SELECT cantidad, nombre FROM productos WHERE id = %s', (form.id_producto.data,))
+            row = cursor.fetchone()
+            cantidad_boletos = form.cantidad.data
+            
+            if row is None or row[0] < cantidad_boletos:
+                flash(f'Error: La película no tiene {cantidad_boletos} asientos disponibles', 'danger')
+                cursor.close()
+                conn.close()
+                return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
+            
+            pelicula_name = row[1]
+            
+            # Validación de las butacas contra la cantidad
+            butacas_list = [b.strip() for b in form.butaca.data.split(',') if b.strip()]
+            if len(butacas_list) != cantidad_boletos:
+                flash(f'Error: Debes seleccionar exactamente {cantidad_boletos} butaca(s). Ocurrió una discrepancia.', 'danger')
+                cursor.close()
+                conn.close()
+                return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
+
+            # Get hora_funcion string
+            cursor.execute('SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
+            func_row = cursor.fetchone()
+            hora_funcion = func_row[0] if func_row else "N/A"
+            
+            # Asignación automática de sala basada en el ID del producto
+            salas = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4D', 'Sala VIP']
+            codigo_sala = salas[form.id_producto.data % len(salas)]
+
+            for butaca in butacas_list:
+                cursor.execute(
+                    '''INSERT INTO boleto (pelicula, codigo_sala, butaca, hora_funcion, id_producto, id_funcion) 
+                       VALUES (%s, %s, %s, %s, %s, %s)''',
+                    (pelicula_name, codigo_sala, butaca, 
+                     hora_funcion, form.id_producto.data, form.id_funcion.data)
+                )
+
             cursor.execute(
-                'INSERT INTO boleto (pelicula, codigo_sala, butaca, hora_funcion) VALUES (%s, %s, %s, %s)',
-                (pelicula, codigo_sala, butaca, hora_funcion)
+                'UPDATE productos SET cantidad = cantidad - %s WHERE id = %s',
+                (cantidad_boletos, form.id_producto.data)
             )
+
+            # Guardamos ambos cambios al mismo tiempo
             conn.commit()
+            
             cursor.close()
             conn.close()
-            flash('Boleto agregado exitosamente', 'success')
-            return redirect(url_for('boleteria'))
+            
+            flash('Boleto registrado y stock actualizado', 'success')
+            return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
+            
         except Exception as e:
-            flash(f'Error al guardar el boleto: {e}', 'danger')
-            return redirect(url_for('boleteria'))
+            flash(f'Error al procesar el boleto: {e}', 'danger')
+            return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
     return render_template('boleteria_form.html', form=form, titulo='Nuevo boleto')
 
 
 @app.route('/boleteria/editar/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def boleteria_editar(id):
     try:
         conn = conectar()
@@ -555,19 +612,44 @@ def boleteria_editar(id):
             flash('Boleto no encontrado', 'danger')
             return redirect(url_for('boleteria'))
 
-        boleto = Boleto(row[0], row[1], row[2], row[3], row[4])
         form = BoletoForm()
+        
+        # Populate choices
+        cursor.execute('SELECT id, nombre FROM productos')
+        productos = cursor.fetchall()
+        form.id_producto.choices = [(p[0], p[1]) for p in productos]
+        
+        cursor.execute('SELECT id_funcion, descripcion, fecha_hora FROM funcion')
+        funciones = cursor.fetchall()
+        form.id_funcion.choices = [(f[0], f"{f[1]} - {f[2]}") for f in funciones]
 
         if request.method == 'GET':
-            form.pelicula.data = boleto.pelicula
-            form.codigo_sala.data = boleto.codigo_sala
-            form.butaca.data = boleto.butaca
-            form.hora_funcion.data = boleto.hora_funcion
+            form.id_producto.data = row[5] if len(row) > 5 else None
+            form.id_funcion.data = row[6] if len(row) > 6 else None
+            form.cantidad.data = 1 # Para obligar al script JS a dejar seleccionar solo 1 en edición
+            form.codigo_sala.data = row[2] # codigo_sala
+            form.butaca.data = row[3] # butaca
 
         if form.validate_on_submit():
+            # Get textual strings for database
+            cursor.execute('SELECT nombre FROM productos WHERE id = %s', (form.id_producto.data,))
+            pel_row = cursor.fetchone()
+            pelicula_name = pel_row[0] if pel_row else "Desconocida"
+            
+            cursor.execute('SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
+            func_row = cursor.fetchone()
+            hora_funcion = func_row[0] if func_row else "N/A"
+
+            # Obtenemos la primera butaca en caso de que vengan varias por error
+            butaca_editar = form.butaca.data.split(',')[0].strip()
+            
+            # Asignación automática de sala basada en el ID del producto
+            salas = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4D', 'Sala VIP']
+            codigo_sala = salas[form.id_producto.data % len(salas)]
+
             cursor.execute(
-                'UPDATE boleto SET pelicula = %s, codigo_sala = %s, butaca = %s, hora_funcion = %s WHERE id_boleto = %s',
-                (form.pelicula.data, form.codigo_sala.data, form.butaca.data, form.hora_funcion.data, id)
+                'UPDATE boleto SET pelicula = %s, codigo_sala = %s, butaca = %s, hora_funcion = %s, id_producto = %s, id_funcion = %s WHERE id_boleto = %s',
+                (pelicula_name, codigo_sala, butaca_editar, hora_funcion, form.id_producto.data, form.id_funcion.data, id)
             )
             conn.commit()
             cursor.close()
@@ -584,6 +666,7 @@ def boleteria_editar(id):
 
 
 @app.route('/boleteria/eliminar/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def boleteria_eliminar(id):
     try:
         conn = conectar()
@@ -593,14 +676,23 @@ def boleteria_eliminar(id):
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
+        
+        # Get id_producto to restore stock
+        cursor.execute('SELECT id_producto FROM boleto WHERE id_boleto = %s', (id,))
+        id_prod_row = cursor.fetchone()
+
         cursor.execute('DELETE FROM boleto WHERE id_boleto = %s', (id,))
-        conn.commit()
         eliminados = cursor.rowcount
+        
+        if eliminados > 0 and id_prod_row:
+            cursor.execute('UPDATE productos SET cantidad = cantidad + 1 WHERE id = %s', (id_prod_row[0],))
+            
+        conn.commit()
         cursor.close()
         conn.close()
 
         if eliminados > 0:
-            flash('Boleto eliminado correctamente', 'warning')
+            flash('Boleto eliminado y stock restaurado', 'warning')
         else:
             flash('No se encontró el boleto a eliminar', 'danger')
 
@@ -612,6 +704,7 @@ def boleteria_eliminar(id):
 
 # ruta para los datos persistentes
 @app.route('/datos', methods=['GET', 'POST'])
+@admin_required
 def datos():
     if request.method == 'POST':
         nombre = request.form.get('nombre')
@@ -639,6 +732,7 @@ def datos():
 
 # ruta para conexión a la base de datos
 @app.route('/conexion')
+@admin_required
 def conexion():
     error = None
     rows = None

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and current_user.rol == 'admin' %}
         
         <section class="card">
             <div class="card-header">
@@ -27,10 +27,27 @@
                     </a>
 
                     <a href="/conexion" class="btn-cimazon" style="background: linear-gradient(135deg, #b388ff, #8e44ad); box-shadow: 0 10px 25px rgba(179, 136, 255, 0.2); border: none;">
-                        <i class="bi bi-server"></i> Conexión DB de usuarios
+                        <i class="bi bi-server"></i> Usuarios registrados
                     </a>
 
                 </div>
+            </div>
+        </section>
+
+    {% elif current_user.is_authenticated %}
+
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="bi bi-person-circle" style="color: var(--accent);"></i> Bienvenido, {{ current_user.nombre }}</h2>
+            </div>
+            <div class="card-body" style="text-align: center; padding: 40px;">
+                <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 30px;">
+                    Has iniciado sesión correctamente. Aquí puedes ver la cartelera de funciones disponibles y adquirir tus boletos.
+                </p>
+                
+                <a href="{{ url_for('productos') }}" class="btn-cimazon" style="padding: 15px 30px; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 10px; border-radius: 8px; text-decoration: none;">
+                    <i class="bi bi-film"></i> Ver Cartelera
+                </a>
             </div>
         </section>
 

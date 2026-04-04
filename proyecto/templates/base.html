@@ -16,13 +16,18 @@
             <ul class="menu-vertical">
                 {% if not current_user.is_authenticated %}
                     <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
-                    <li><a href="{{ url_for('about') }}">Acerca de Cimazon</a></li>
+                    <li><a href="{{ url_for('about') }}">Acerca de</a></li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('inicio') }}">Panel de control</a></li> 
-                    <li><a href="{{ url_for('productos') }}">Funciones</a></li>
-                    <li><a href="{{ url_for('funciones') }}">Compras</a></li>
-                    <li><a href="{{ url_for('boleteria') }}">Boletos</a></li>
+                    {% if current_user.rol == 'admin' %}
+                        <li><a href="{{ url_for('inicio') }}">Panel de control</a></li> 
+                        <li><a href="{{ url_for('productos') }}">Cartelera (Admin)</a></li>
+                        <li><a href="{{ url_for('funciones') }}">Ventas y Funciones</a></li>
+                        <li><a href="{{ url_for('boleteria') }}">Gestión de Boletos</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('productos') }}">Cartelera</a></li>
+                        <li><a href="{{ url_for('boleteria_nuevo') }}">Comprar Boleto</a></li>
+                    {% endif %}
                     <li><a href="{{ url_for('logout') }}" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" class="btn-login"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</a></li>

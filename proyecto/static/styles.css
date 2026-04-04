@@ -275,6 +275,11 @@ textarea.small {
     max-width: 260px;
 }
 
+option {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
 button,
 .btn-cimazon,
 input[type='submit'] {
