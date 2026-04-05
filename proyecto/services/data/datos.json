@@ -4,5 +4,11 @@
         "descripcion": "Un marino parapléjico es enviado a la luna Pandora, donde se debate entre cumplir sus órdenes o proteger el planeta.",
         "cantidad": "32",
         "precio": "5"
+    },
+    {
+        "nombre": "Avatar",
+        "descripcion": "Un marino parapléjico es enviado a la luna Pandora donde se debate entre cumplir sus órdenes o proteger el planeta.",
+        "cantidad": "32",
+        "precio": "5"
     }
 ]
