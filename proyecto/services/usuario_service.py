@@ -26,7 +26,6 @@ def crear_tabla_usuario():
         return
 
     cursor = conn.cursor()
-    cursor.execute('USE cimazon')
     cursor.execute(
         '''
         CREATE TABLE IF NOT EXISTS usuario (
@@ -49,7 +48,6 @@ def obtener_usuario_por_email(email):
         return None
 
     cursor = conn.cursor()
-    cursor.execute('USE cimazon')
     column = get_usuario_email_column(cursor)
     cursor.execute(f'SELECT id_usuario, nombre, {column}, password, rol FROM usuario WHERE {column} = %s', (email,))
     row = cursor.fetchone()
@@ -67,7 +65,6 @@ def obtener_usuario_por_id(user_id):
         return None
 
     cursor = conn.cursor()
-    cursor.execute('USE cimazon')
     column = get_usuario_email_column(cursor)
     cursor.execute(f'SELECT id_usuario, nombre, {column}, password, rol FROM usuario WHERE id_usuario = %s', (user_id,))
     row = cursor.fetchone()
@@ -85,7 +82,6 @@ def registrar_usuario(nombre, email, password_hash):
         raise Exception('No se pudo conectar a la base de datos')
 
     cursor = conn.cursor()
-    cursor.execute('USE cimazon')
     column = get_usuario_email_column(cursor)
     cursor.execute(
         f'INSERT INTO usuario (nombre, {column}, password) VALUES (%s, %s, %s)',

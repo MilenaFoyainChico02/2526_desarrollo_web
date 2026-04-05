@@ -56,7 +56,6 @@ def listar_productos():
             return []
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT id, nombre, descripcion, cantidad, precio FROM productos')
         rows = cursor.fetchall()
@@ -142,7 +141,6 @@ def exportar_pdf():
             return redirect(url_for('inicio'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
         funciones_vendidas = cursor.fetchall()  # Trae los datos reales
@@ -231,7 +229,6 @@ def cartelera_nuevo():
                 return redirect(url_for('funciones_mysql'))
 
             cursor = conn.cursor()
-            cursor.execute('USE cimazon')
             cursor.execute(
                 'INSERT INTO productos (nombre, descripcion, cantidad, precio) VALUES (%s, %s, %s, %s)',
                 (nombre, descripcion, cantidad, precio)
@@ -259,7 +256,6 @@ def funciones():
             return redirect(url_for('inicio'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         # Pedimos los 5 datos
         cursor.execute(
             'SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
@@ -296,7 +292,6 @@ def funciones_nuevo():
                 return redirect(url_for('funciones'))
 
             cursor = conn.cursor()
-            cursor.execute('USE cimazon')
             cursor.execute(
                 'INSERT INTO funcion (descripcion, fecha_hora, total, metodo_pago) VALUES (%s, %s, %s, %s)',
                 (form.descripcion.data, form.fecha_hora.data,
@@ -326,7 +321,6 @@ def funciones_editar(id):
             return redirect(url_for('funciones'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT descripcion, fecha_hora, total, metodo_pago FROM funcion WHERE id_funcion = %s', (id,))
         row = cursor.fetchone()
@@ -373,7 +367,6 @@ def funciones_eliminar(id):
             return redirect(url_for('funciones'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute('DELETE FROM funcion WHERE id_funcion = %s', (id,))
         conn.commit()
         eliminados = cursor.rowcount
@@ -407,7 +400,6 @@ def producto_editar(id):
             return redirect(url_for('funciones_mysql'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT id, nombre, descripcion, cantidad, precio FROM productos WHERE id = %s', (id,))
         row = cursor.fetchone()
@@ -454,7 +446,6 @@ def producto_eliminar(id):
             return redirect(url_for('funciones_mysql'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute('DELETE FROM productos WHERE id = %s', (id,))
         conn.commit()
         eliminados = cursor.rowcount
@@ -483,7 +474,6 @@ def funciones_mysql():
             return redirect(url_for('inicio'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT id, nombre, descripcion, cantidad, precio FROM productos')
         rows = cursor.fetchall()
@@ -518,7 +508,6 @@ def boleteria():
             return redirect(url_for('inicio'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
         rows = cursor.fetchall()
@@ -539,7 +528,6 @@ def butacas_ocupadas(id_funcion):
         if not conn or not conn.is_connected():
             return jsonify([])
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute(
             'SELECT butaca FROM boleto WHERE id_funcion = %s', (id_funcion,))
         rows = cursor.fetchall()
@@ -582,7 +570,6 @@ def carrito_checkout():
             return redirect(url_for('carrito'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
 
         for item in carrito_items:
             # Revalidar stock
@@ -631,7 +618,6 @@ def boleteria_nuevo():
         conn = conectar()
         if conn and conn.is_connected():
             cursor = conn.cursor()
-            cursor.execute('USE cimazon')
             cursor.execute('SELECT id, nombre FROM productos')
             productos = cursor.fetchall()
             form.id_producto.choices = [(p[0], p[1]) for p in productos]
@@ -659,7 +645,6 @@ def boleteria_nuevo():
                 return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
             cursor = conn.cursor()
-            cursor.execute('USE cimazon')
 
             # Check stock and get pelicula string
             cursor.execute(
@@ -743,7 +728,6 @@ def boleteria_editar(id):
             return redirect(url_for('boleteria'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute('SELECT * FROM boleto WHERE id_boleto = %s', (id,))
         row = cursor.fetchone()
 
@@ -821,7 +805,6 @@ def boleteria_eliminar(id):
             return redirect(url_for('boleteria'))
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
 
         # Get id_producto to restore stock
         cursor.execute(
@@ -904,7 +887,6 @@ def conexion():
             return render_template('conexion.html', error=error, rows=rows, columns=columns, table=table)
 
         cursor = conn.cursor()
-        cursor.execute('USE cimazon')
         cursor.execute('SELECT * FROM usuario')
         rows = cursor.fetchall()
         columns = cursor.column_names
