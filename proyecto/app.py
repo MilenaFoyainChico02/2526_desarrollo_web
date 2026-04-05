@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -31,14 +31,19 @@ login_manager.login_message_category = 'warning'
 crear_tabla_usuario()
 
 # Dead DB Init Block Removed
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return obtener_usuario_por_id(user_id)
+
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.rol != 'admin':
-            flash('No tienes permisos de administrador para acceder a esta página.', 'danger')
+            flash(
+                'No tienes permisos de administrador para acceder a esta página.', 'danger')
             return redirect(url_for('inicio'))
         return f(*args, **kwargs)
     return decorated_function
@@ -52,7 +57,8 @@ def listar_productos():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos')
+        cursor.execute(
+            'SELECT id, nombre, descripcion, cantidad, precio FROM productos')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -77,7 +83,7 @@ def registro():
     if form.validate_on_submit():
         nombre = form.nombre.data
         email = form.email.data
-        password = request.form['password']
+        password = form.password.data
 
         usuario_existente = obtener_usuario_por_email(email)
         if usuario_existente:
@@ -92,6 +98,7 @@ def registro():
         return redirect(url_for('login'))
 
     return render_template('auth/registro.html', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -112,12 +119,14 @@ def login():
 
     return render_template('auth/login.html', form=form)
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('Sesión cerrada correctamente', 'info')
     return redirect(url_for('inicio'))
+
 
 @app.route('/exportar/pdf')
 @admin_required
@@ -134,8 +143,9 @@ def exportar_pdf():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
-        funciones_vendidas = cursor.fetchall() # Trae los datos reales
+        cursor.execute(
+            'SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
+        funciones_vendidas = cursor.fetchall()  # Trae los datos reales
         cursor.close()
         conn.close()
     except Exception as e:
@@ -150,7 +160,7 @@ def exportar_pdf():
 
     pdf.set_font("Arial", "B", 10)
     pdf.cell(15, 10, "ID", 1)
-    pdf.cell(65, 10, "Descripcion", 1) 
+    pdf.cell(65, 10, "Descripcion", 1)
     pdf.cell(45, 10, "Fecha y hora", 1)
     pdf.cell(25, 10, "Total", 1)
     pdf.cell(40, 10, "Metodo de pago", 1)
@@ -159,44 +169,50 @@ def exportar_pdf():
     pdf.set_font("Arial", "", 10)
 
     for f in funciones_vendidas:
-        pdf.cell(15, 10, str(f[0]), 1) # id_funcion
-        
-        desc = str(f[1])[:35]          # descripcion 
+        pdf.cell(15, 10, str(f[0]), 1)  # id_funcion
+
+        desc = str(f[1])[:35]          # descripcion
         pdf.cell(65, 10, desc, 1)
-        
-        pdf.cell(45, 10, str(f[2]), 1) # fecha_hora
-        
+
+        pdf.cell(45, 10, str(f[2]), 1)  # fecha_hora
+
         # Validamos el total por si es None en la base de datos
         total_val = float(f[3]) if f[3] is not None else 0.0
-        pdf.cell(25, 10, f"${total_val:.2f}", 1) 
-        
-        pdf.cell(40, 10, str(f[4]), 1) # metodo_pago
+        pdf.cell(25, 10, f"${total_val:.2f}", 1)
+
+        pdf.cell(40, 10, str(f[4]), 1)  # metodo_pago
         pdf.ln()
 
     # generación y descarga del PDF
     output_data = pdf.output(dest='S')
     if isinstance(output_data, str):
-        output_bytes = output_data.encode('latin-1', 'replace') 
+        output_bytes = output_data.encode('latin-1', 'replace')
     elif isinstance(output_data, (bytes, bytearray)):
         output_bytes = bytes(output_data)
     else:
         output_bytes = str(output_data).encode('latin-1', 'replace')
 
     response = make_response(output_bytes)
-    response.headers.set('Content-Disposition', 'attachment', filename='reporte_ventas_cimazon.pdf')
+    response.headers.set('Content-Disposition', 'attachment',
+                         filename='reporte_ventas_cimazon.pdf')
     response.headers.set('Content-Type', 'application/pdf')
 
     return response
 
 # ruta principal
+
+
 @app.route('/')
 def inicio():
     return render_template('index.html')
 
 # rutas de navegación
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 
 @app.route('/cartelera/nuevo', methods=['GET', 'POST'])
 @admin_required
@@ -232,6 +248,7 @@ def cartelera_nuevo():
 
     return render_template('cartelera_form.html', form=form, titulo='Agregar nueva función')
 
+
 @app.route('/funciones')
 @admin_required
 def funciones():
@@ -244,7 +261,8 @@ def funciones():
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
         # Pedimos los 5 datos
-        cursor.execute('SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
+        cursor.execute(
+            'SELECT id_funcion, descripcion, fecha_hora, total, metodo_pago FROM funcion')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -265,6 +283,7 @@ def funciones():
         flash(f'Error en el sistema: {e}', 'danger')
         return redirect(url_for('inicio'))
 
+
 @app.route('/funciones/nuevo', methods=['GET', 'POST'])
 @admin_required
 def funciones_nuevo():
@@ -280,7 +299,8 @@ def funciones_nuevo():
             cursor.execute('USE cimazon')
             cursor.execute(
                 'INSERT INTO funcion (descripcion, fecha_hora, total, metodo_pago) VALUES (%s, %s, %s, %s)',
-                (form.descripcion.data, form.fecha_hora.data, float(form.total.data), form.metodo_pago.data)
+                (form.descripcion.data, form.fecha_hora.data,
+                 float(form.total.data), form.metodo_pago.data)
             )
             conn.commit()
             cursor.close()
@@ -294,6 +314,7 @@ def funciones_nuevo():
 
     return render_template('funciones_form.html', form=form, titulo='Nueva función')
 
+
 @app.route('/funciones/editar/<int:id>', methods=['GET', 'POST'])
 @admin_required
 def funciones_editar(id):
@@ -306,7 +327,8 @@ def funciones_editar(id):
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT descripcion, fecha_hora, total, metodo_pago FROM funcion WHERE id_funcion = %s', (id,))
+        cursor.execute(
+            'SELECT descripcion, fecha_hora, total, metodo_pago FROM funcion WHERE id_funcion = %s', (id,))
         row = cursor.fetchone()
 
         if row is None:
@@ -324,7 +346,8 @@ def funciones_editar(id):
         if form.validate_on_submit():
             cursor.execute(
                 'UPDATE funcion SET descripcion = %s, fecha_hora = %s, total = %s, metodo_pago = %s WHERE id_funcion = %s',
-                (form.descripcion.data, form.fecha_hora.data, float(form.total.data), form.metodo_pago.data, id)
+                (form.descripcion.data, form.fecha_hora.data, float(
+                    form.total.data), form.metodo_pago.data, id)
             )
             conn.commit()
             cursor.close()
@@ -338,6 +361,7 @@ def funciones_editar(id):
     except Exception as e:
         flash(f'Error al editar la función: {e}', 'danger')
         return redirect(url_for('funciones'))
+
 
 @app.route('/funciones/eliminar/<int:id>', methods=['POST', 'GET'])
 @admin_required
@@ -366,9 +390,11 @@ def funciones_eliminar(id):
         flash(f'Error al eliminar la función: {e}', 'danger')
         return redirect(url_for('funciones'))
 
+
 @app.route('/productos')
 def productos():
     return redirect(url_for('funciones_mysql'))
+
 
 @app.route('/productos/editar/<int:id>', methods=['GET', 'POST'])
 @admin_required
@@ -382,7 +408,8 @@ def producto_editar(id):
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos WHERE id = %s', (id,))
+        cursor.execute(
+            'SELECT id, nombre, descripcion, cantidad, precio FROM productos WHERE id = %s', (id,))
         row = cursor.fetchone()
 
         if row is None:
@@ -400,7 +427,8 @@ def producto_editar(id):
         if form.validate_on_submit():
             cursor.execute(
                 'UPDATE productos SET nombre = %s, descripcion = %s, cantidad = %s, precio = %s WHERE id = %s',
-                (form.nombre.data, form.descripcion.data, int(form.cantidad.data), float(form.precio.data), id)
+                (form.nombre.data, form.descripcion.data, int(
+                    form.cantidad.data), float(form.precio.data), id)
             )
             conn.commit()
             cursor.close()
@@ -414,6 +442,7 @@ def producto_editar(id):
     except Exception as e:
         flash(f'Error al editar la función: {e}', 'danger')
         return redirect(url_for('funciones_mysql'))
+
 
 @app.route('/productos/eliminar/<int:id>', methods=['GET', 'POST'])
 @admin_required
@@ -443,6 +472,8 @@ def producto_eliminar(id):
         return redirect(url_for('funciones_mysql'))
 
 # ruta para listar productos con mysql
+
+
 @app.route('/funciones_mysql')
 def funciones_mysql():
     try:
@@ -453,11 +484,12 @@ def funciones_mysql():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id, nombre, descripcion, cantidad, precio FROM productos')
+        cursor.execute(
+            'SELECT id, nombre, descripcion, cantidad, precio FROM productos')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        
+
         productos_mysql = []
         for row in rows:
             productos_mysql.append({
@@ -467,14 +499,16 @@ def funciones_mysql():
                 'cantidad': row[3],
                 'precio': float(row[4]) if row[4] is not None else 0.0
             })
-            
+
         return render_template('cartelera.html', productos=productos_mysql)
-        
+
     except Exception as e:
         flash(f'Error al conectar a la base de datos: {e}', 'danger')
         return redirect(url_for('inicio'))
-    
+
 # ruta para la boleteria con mysql
+
+
 @app.route('/boleteria')
 def boleteria():
     try:
@@ -485,21 +519,113 @@ def boleteria():
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        cursor.execute('SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
+        cursor.execute(
+            'SELECT id_boleto, pelicula, codigo_sala, butaca, hora_funcion FROM boleto')
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        boletos_mysql = [Boleto(row[0], row[1], row[2], row[3], row[4]) for row in rows]
+        boletos_mysql = [Boleto(row[0], row[1], row[2],
+                                row[3], row[4]) for row in rows]
         return render_template('boleteria.html', boletos=boletos_mysql)
     except Exception as e:
         flash(f'Error al conectar a la base de datos: {e}', 'danger')
         return redirect(url_for('inicio'))
 
 
+@app.route('/api/butacas_ocupadas/<int:id_funcion>')
+def butacas_ocupadas(id_funcion):
+    try:
+        conn = conectar()
+        if not conn or not conn.is_connected():
+            return jsonify([])
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+        cursor.execute(
+            'SELECT butaca FROM boleto WHERE id_funcion = %s', (id_funcion,))
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify([r[0] for r in rows])
+    except Exception as e:
+        return jsonify([])
+
+
+@app.route('/carrito')
+def carrito():
+    carrito_items = session.get('carrito', [])
+    total = sum(item.get('subtotal', 0) for item in carrito_items)
+    return render_template('carrito.html', carrito=carrito_items, total=total)
+
+
+@app.route('/carrito/eliminar/<int:index>')
+def carrito_eliminar(index):
+    carrito_items = session.get('carrito', [])
+    if 0 <= index < len(carrito_items):
+        carrito_items.pop(index)
+        session['carrito'] = carrito_items
+        session.modified = True
+        flash('Boleto(s) eliminado(s) del carrito', 'info')
+    return redirect(url_for('carrito'))
+
+
+@app.route('/carrito/checkout', methods=['POST'])
+def carrito_checkout():
+    carrito_items = session.get('carrito', [])
+    if not carrito_items:
+        flash('Tu carrito está vacío', 'warning')
+        return redirect(url_for('carrito'))
+
+    try:
+        conn = conectar()
+        if not conn or not conn.is_connected():
+            flash('Error de conexión con la base de datos', 'danger')
+            return redirect(url_for('carrito'))
+
+        cursor = conn.cursor()
+        cursor.execute('USE cimazon')
+
+        for item in carrito_items:
+            # Revalidar stock
+            cursor.execute(
+                'SELECT cantidad FROM productos WHERE id = %s', (item['id_producto'],))
+            row = cursor.fetchone()
+            if row is None or row[0] < item['cantidad']:
+                flash(
+                    f"Error: Sin stock para {item['pelicula_name']} en el momento del pago.", 'danger')
+                cursor.close()
+                conn.close()
+                return redirect(url_for('carrito'))
+
+            for butaca in item['butacas']:
+                cursor.execute(
+                    '''INSERT INTO boleto (pelicula, codigo_sala, butaca, hora_funcion, id_producto, id_funcion) 
+                       VALUES (%s, %s, %s, %s, %s, %s)''',
+                    (item['pelicula_name'], item['codigo_sala'], butaca,
+                     item['hora_funcion'], item['id_producto'], item['id_funcion'])
+                )
+
+            cursor.execute(
+                'UPDATE productos SET cantidad = cantidad - %s WHERE id = %s',
+                (item['cantidad'], item['id_producto'])
+            )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        session.pop('carrito', None)
+        flash('¡Compra simulada y registros completados con éxito!', 'success')
+        return redirect(url_for('inicio'))
+
+    except Exception as e:
+        flash(f'Error procesando el pago: {e}', 'danger')
+        return redirect(url_for('carrito'))
+
+
 @app.route('/boleteria/nuevo', methods=['GET', 'POST'])
 def boleteria_nuevo():
     form = BoletoForm()
-    
+
     # Populate choices before validation
     try:
         conn = conectar()
@@ -509,10 +635,12 @@ def boleteria_nuevo():
             cursor.execute('SELECT id, nombre FROM productos')
             productos = cursor.fetchall()
             form.id_producto.choices = [(p[0], p[1]) for p in productos]
-            
-            cursor.execute('SELECT id_funcion, descripcion, fecha_hora FROM funcion')
+
+            cursor.execute(
+                'SELECT id_funcion, descripcion, fecha_hora FROM funcion')
             funciones = cursor.fetchall()
-            form.id_funcion.choices = [(f[0], f"{f[1]} - {f[2]}") for f in funciones]
+            form.id_funcion.choices = [
+                (f[0], f"{f[1]} - {f[2]}") for f in funciones]
             cursor.close()
             conn.close()
     except Exception as e:
@@ -534,57 +662,70 @@ def boleteria_nuevo():
             cursor.execute('USE cimazon')
 
             # Check stock and get pelicula string
-            cursor.execute('SELECT cantidad, nombre FROM productos WHERE id = %s', (form.id_producto.data,))
+            cursor.execute(
+                'SELECT cantidad, nombre FROM productos WHERE id = %s', (form.id_producto.data,))
             row = cursor.fetchone()
             cantidad_boletos = form.cantidad.data
-            
+
             if row is None or row[0] < cantidad_boletos:
-                flash(f'Error: La película no tiene {cantidad_boletos} asientos disponibles', 'danger')
+                flash(
+                    f'Error: La película no tiene {cantidad_boletos} asientos disponibles', 'danger')
                 cursor.close()
                 conn.close()
                 return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
-            
+
             pelicula_name = row[1]
-            
+
             # Validación de las butacas contra la cantidad
-            butacas_list = [b.strip() for b in form.butaca.data.split(',') if b.strip()]
+            butacas_list = [b.strip()
+                            for b in form.butaca.data.split(',') if b.strip()]
             if len(butacas_list) != cantidad_boletos:
-                flash(f'Error: Debes seleccionar exactamente {cantidad_boletos} butaca(s). Ocurrió una discrepancia.', 'danger')
+                flash(
+                    f'Error: Debes seleccionar exactamente {cantidad_boletos} butaca(s). Ocurrió una discrepancia.', 'danger')
                 cursor.close()
                 conn.close()
                 return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
             # Get hora_funcion string
-            cursor.execute('SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
+            cursor.execute(
+                'SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
             func_row = cursor.fetchone()
             hora_funcion = func_row[0] if func_row else "N/A"
-            
+
             # Asignación automática de sala basada en el ID del producto
             salas = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4D', 'Sala VIP']
             codigo_sala = salas[form.id_producto.data % len(salas)]
 
-            for butaca in butacas_list:
-                cursor.execute(
-                    '''INSERT INTO boleto (pelicula, codigo_sala, butaca, hora_funcion, id_producto, id_funcion) 
-                       VALUES (%s, %s, %s, %s, %s, %s)''',
-                    (pelicula_name, codigo_sala, butaca, 
-                     hora_funcion, form.id_producto.data, form.id_funcion.data)
-                )
-
+            # Get precio para el carrito
             cursor.execute(
-                'UPDATE productos SET cantidad = cantidad - %s WHERE id = %s',
-                (cantidad_boletos, form.id_producto.data)
-            )
+                'SELECT precio FROM productos WHERE id = %s', (form.id_producto.data,))
+            p_row = cursor.fetchone()
+            precio_unit = float(p_row[0]) if p_row else 0.0
 
-            # Guardamos ambos cambios al mismo tiempo
-            conn.commit()
-            
             cursor.close()
             conn.close()
-            
-            flash('Boleto registrado y stock actualizado', 'success')
-            return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
-            
+
+            # Guardar en carrito en lugar de base de datos
+            carrito_items = session.get('carrito', [])
+            nuevo_item = {
+                'id_producto': form.id_producto.data,
+                'pelicula_name': pelicula_name,
+                'codigo_sala': codigo_sala,
+                'butacas': butacas_list,
+                'hora_funcion': hora_funcion,
+                'id_funcion': form.id_funcion.data,
+                'cantidad': cantidad_boletos,
+                'precio_unitario': precio_unit,
+                'subtotal': precio_unit * cantidad_boletos
+            }
+
+            carrito_items.append(nuevo_item)
+            session['carrito'] = carrito_items
+            session.modified = True
+
+            flash('Boletos agregados al carrito exitosamente', 'success')
+            return redirect(url_for('carrito'))
+
         except Exception as e:
             flash(f'Error al procesar el boleto: {e}', 'danger')
             return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
@@ -613,43 +754,48 @@ def boleteria_editar(id):
             return redirect(url_for('boleteria'))
 
         form = BoletoForm()
-        
+
         # Populate choices
         cursor.execute('SELECT id, nombre FROM productos')
         productos = cursor.fetchall()
         form.id_producto.choices = [(p[0], p[1]) for p in productos]
-        
-        cursor.execute('SELECT id_funcion, descripcion, fecha_hora FROM funcion')
+
+        cursor.execute(
+            'SELECT id_funcion, descripcion, fecha_hora FROM funcion')
         funciones = cursor.fetchall()
-        form.id_funcion.choices = [(f[0], f"{f[1]} - {f[2]}") for f in funciones]
+        form.id_funcion.choices = [
+            (f[0], f"{f[1]} - {f[2]}") for f in funciones]
 
         if request.method == 'GET':
             form.id_producto.data = row[5] if len(row) > 5 else None
             form.id_funcion.data = row[6] if len(row) > 6 else None
-            form.cantidad.data = 1 # Para obligar al script JS a dejar seleccionar solo 1 en edición
-            form.codigo_sala.data = row[2] # codigo_sala
-            form.butaca.data = row[3] # butaca
+            form.cantidad.data = 1  # Para obligar al script JS a dejar seleccionar solo 1 en edición
+            form.codigo_sala.data = row[2]  # codigo_sala
+            form.butaca.data = row[3]  # butaca
 
         if form.validate_on_submit():
             # Get textual strings for database
-            cursor.execute('SELECT nombre FROM productos WHERE id = %s', (form.id_producto.data,))
+            cursor.execute(
+                'SELECT nombre FROM productos WHERE id = %s', (form.id_producto.data,))
             pel_row = cursor.fetchone()
             pelicula_name = pel_row[0] if pel_row else "Desconocida"
-            
-            cursor.execute('SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
+
+            cursor.execute(
+                'SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
             func_row = cursor.fetchone()
             hora_funcion = func_row[0] if func_row else "N/A"
 
             # Obtenemos la primera butaca en caso de que vengan varias por error
             butaca_editar = form.butaca.data.split(',')[0].strip()
-            
+
             # Asignación automática de sala basada en el ID del producto
             salas = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4D', 'Sala VIP']
             codigo_sala = salas[form.id_producto.data % len(salas)]
 
             cursor.execute(
                 'UPDATE boleto SET pelicula = %s, codigo_sala = %s, butaca = %s, hora_funcion = %s, id_producto = %s, id_funcion = %s WHERE id_boleto = %s',
-                (pelicula_name, codigo_sala, butaca_editar, hora_funcion, form.id_producto.data, form.id_funcion.data, id)
+                (pelicula_name, codigo_sala, butaca_editar, hora_funcion,
+                 form.id_producto.data, form.id_funcion.data, id)
             )
             conn.commit()
             cursor.close()
@@ -676,17 +822,19 @@ def boleteria_eliminar(id):
 
         cursor = conn.cursor()
         cursor.execute('USE cimazon')
-        
+
         # Get id_producto to restore stock
-        cursor.execute('SELECT id_producto FROM boleto WHERE id_boleto = %s', (id,))
+        cursor.execute(
+            'SELECT id_producto FROM boleto WHERE id_boleto = %s', (id,))
         id_prod_row = cursor.fetchone()
 
         cursor.execute('DELETE FROM boleto WHERE id_boleto = %s', (id,))
         eliminados = cursor.rowcount
-        
+
         if eliminados > 0 and id_prod_row:
-            cursor.execute('UPDATE productos SET cantidad = cantidad + 1 WHERE id = %s', (id_prod_row[0],))
-            
+            cursor.execute(
+                'UPDATE productos SET cantidad = cantidad + 1 WHERE id = %s', (id_prod_row[0],))
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -707,10 +855,18 @@ def boleteria_eliminar(id):
 @admin_required
 def datos():
     if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        descripcion = request.form.get('descripcion')
-        cantidad = request.form.get('cantidad')
-        precio = request.form.get('precio')
+        nombre = request.form.get('nombre', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        cantidad = request.form.get('cantidad', '').strip()
+        precio = request.form.get('precio', '').strip()
+
+        if not all([nombre, descripcion, cantidad, precio]):
+            flash('Error: Todos los campos son obligatorios', 'danger')
+            return redirect(url_for('datos'))
+
+        # limpiar separadores de csv
+        nombre = nombre.replace(',', '')
+        descripcion = descripcion.replace(',', '')
 
         dic = {
             'nombre': nombre,
@@ -731,6 +887,8 @@ def datos():
     return render_template('datos.html', datos_txt=datos_txt, datos_json=datos_json, datos_csv=datos_csv)
 
 # ruta para conexión a la base de datos
+
+
 @app.route('/conexion')
 @admin_required
 def conexion():
@@ -756,6 +914,7 @@ def conexion():
     except Exception as e:
         error = f'Error al conectar a la base de datos: {e}'
         return render_template('conexion.html', error=error, rows=rows, columns=columns, table=table)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

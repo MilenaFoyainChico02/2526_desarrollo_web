@@ -13,7 +13,7 @@ class carteleraForm(FlaskForm):
 class BoletoForm(FlaskForm):
     id_producto = SelectField('Película', coerce=int, validators=[DataRequired()])
     id_funcion = SelectField('Hora de la función', coerce=int, validators=[DataRequired()])
-    cantidad = SelectField('Cantidad de boletos', choices=[(str(i), str(i)) for i in range(1, 11)], coerce=int, default=1)
+    cantidad = SelectField('Cantidad de boletos', choices=[(i, str(i)) for i in range(1, 11)], coerce=int, default=1)
     codigo_sala = SelectField('Código de sala', choices=[('Sala 1', 'Sala 1 - Tradicional'), ('Sala 2', 'Sala 2 - Tradicional'), ('Sala 3', 'Sala 3 - 3D'), ('Sala 4D', 'Sala 4 - 4D Experiencia'), ('Sala VIP', 'Sala VIP - Lounge')], validate_choice=False)
     butaca = StringField('Butaca', validators=[DataRequired(), Length(min=1, max=100)])
     

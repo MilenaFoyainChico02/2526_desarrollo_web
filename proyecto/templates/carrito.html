@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %} Carrito de Compras {% endblock %}
+
+{% block content %}
+<div class="contenedor-formulario" style="max-width: 800px; padding: 30px;">
+    <h2><i class="bi bi-cart-check-fill"></i> Tu Carrito de Compras</h2>
+    
+    {% if carrito|length > 0 %}
+        <div class="carrito-listado" style="margin-top: 20px;">
+            {% for item in carrito %}
+            <div class="carrito-item" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
+                <div class="item-info">
+                    <h3 style="margin: 0; font-size: 1.3rem; color: #fff;">{{ item.pelicula_name }}</h3>
+                    <p style="margin: 5px 0 0 0; color: #ccc; font-size: 0.9rem;">
+                        <strong>Función:</strong> {{ item.hora_funcion }}<br>
+                        <strong>Sala:</strong> {{ item.codigo_sala }} <br>
+                        <strong>Butacas:</strong> {{ item.butacas | join(', ') }} 
+                    </p>
+                    <p style="margin: 5px 0 0 0; color: var(--accent);">{{ item.cantidad }}x - ${{ item.precio_unitario }} c/u</p>
+                </div>
+                <div class="item-actions" style="text-align: right;">
+                    <p style="font-size: 1.4rem; font-weight: bold; margin: 0 0 10px 0;">Subtotal: ${{ item.subtotal }}</p>
+                    <a href="{{ url_for('carrito_eliminar', index=loop.index0) }}" class="btn-icono-form btn-cancelar-x" style="padding: 5px 10px; font-size: 0.9rem;">
+                        <i class="bi bi-trash3-fill"></i> Quitar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="carrito-total" style="text-align: right; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="font-size: 1.8rem; color: #fff;">Total a pagar: <span style="color: var(--accent);">${{ total }}</span></h3>
+        </div>
+
+        <!-- FORMULARIO PAGO SIMULADO -->
+        <h3 style="margin-top: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Información de Pago</h3>
+        <form method="POST" action="{{ url_for('carrito_checkout') }}" style="margin-top: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Nombre en la tarjeta</label>
+                    <input type="text" class="form-control" placeholder="EJ: JUAN PEREZ" required style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); padding: 10px; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label>Número de Tarjeta (Simulado)</label>
+                    <input type="text" class="form-control" placeholder="1234 5678 9101 1121" required pattern="\d{16}" title="Debe contener 16 dígitos" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); padding: 10px; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Exp. (MM/AA)</label>
+                    <input type="text" class="form-control" placeholder="12/28" required pattern="\d{2}/\d{2}" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); padding: 10px; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label>CVV</label>
+                    <input type="password" class="form-control" placeholder="***" required pattern="\d{3,4}" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); padding: 10px; color: #fff;">
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button type="submit" class="btn-primary" style="font-size: 1.2rem; padding: 15px 40px; width: 100%;">
+                    <i class="bi bi-credit-card-2-front"></i> Confirmar Pago y Finalizar Compra
+                </button>
+            </div>
+        </form>
+
+    {% else %}
+        <div style="text-align: center; padding: 50px 0;">
+            <i class="bi bi-cart-x" style="font-size: 4rem; color: rgba(255,255,255,0.2);"></i>
+            <h3 style="color: #ccc; margin-top: 20px;">Tu carrito está vacío.</h3>
+            <a href="{% if current_user.rol == 'admin' %}{{ url_for('productos') }}{% else %}{{ url_for('boleteria_nuevo') }}{% endif %}" class="btn-primary" style="margin-top: 20px; display: inline-block;">
+                Ir a Boletería
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

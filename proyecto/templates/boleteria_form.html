@@ -109,6 +109,14 @@
             box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
             font-weight: bold;
         }
+        .seat.occupied {
+            background: rgba(231, 76, 60, 0.4);
+            color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(231, 76, 60, 0.2);
+            cursor: not-allowed;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
     </style>
 
     <script>
@@ -186,6 +194,34 @@
                 }
             });
             
+            const funcionSelect = document.getElementById('id_funcion');
+
+            function loadOccupiedSeats() {
+                const funcionId = funcionSelect.value;
+                if(!funcionId) return;
+                
+                fetch(`/api/butacas_ocupadas/${funcionId}`)
+                    .then(r => r.json())
+                    .then(ocupadas => {
+                        // Reset all seats first
+                        document.querySelectorAll('.seat').forEach(el => {
+                            el.classList.remove('occupied');
+                            // If an an already selected seat became occupied (rare issue), remove it
+                            if (ocupadas.includes(el.innerText)) {
+                                el.classList.add('occupied');
+                                el.classList.remove('selected');
+                                selectedSeats = selectedSeats.filter(s => s !== el.innerText);
+                            }
+                        });
+                        updateDisplay();
+                    })
+                    .catch(e => console.error('Error fetching seats', e));
+            }
+
+            funcionSelect.addEventListener('change', loadOccupiedSeats);
+            
+            // Initial Load
+            loadOccupiedSeats();
             updateDisplay();
         });
     </script>
