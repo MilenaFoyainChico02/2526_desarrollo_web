@@ -98,8 +98,30 @@ def insertar_peliculas_ejemplo():
         except Exception as e:
             print(f"Error insertando películas: {e}")
 
+def insertar_funciones_ejemplo():
+    conn = conectar()
+    if conn and conn.is_connected():
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM funcion")
+            if cursor.fetchone()[0] == 0:
+                funciones_lista = [
+                    ('Matinee - Todas las Salas', '2026-04-06 14:00', 0, 'N/A'),
+                    ('Tarde - Todas las Salas', '2026-04-06 17:30', 0, 'N/A'),
+                    ('Noche - Todas las Salas', '2026-04-06 20:45', 0, 'N/A'),
+                    ('Desvelada - Todas las Salas', '2026-04-06 23:30', 0, 'N/A')
+                ]
+                cursor.executemany("INSERT INTO funcion (descripcion, fecha_hora, total, metodo_pago) VALUES (%s, %s, %s, %s)", funciones_lista)
+                conn.commit()
+                print("4 Funciones (Horarios) insertadas de ejemplo exitosamente.")
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error insertando funciones: {e}")
+
 inicializar_tablas_restantes()
 insertar_peliculas_ejemplo()
+insertar_funciones_ejemplo()
 
 @login_manager.user_loader
 def load_user(user_id):
