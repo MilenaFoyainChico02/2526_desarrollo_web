@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -29,9 +30,6 @@ login_manager.login_message = 'Debes iniciar sesión para acceder a esta página
 login_manager.login_message_category = 'warning'
 
 crear_tabla_usuario()
-
-# Dead DB Init Block Removed
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -498,7 +496,6 @@ def funciones_mysql():
 
 # ruta para la boleteria con mysql
 
-
 @app.route('/boleteria')
 def boleteria():
     try:
@@ -572,7 +569,6 @@ def carrito_checkout():
         cursor = conn.cursor()
 
         for item in carrito_items:
-            # Revalidar stock
             cursor.execute(
                 'SELECT cantidad FROM productos WHERE id = %s', (item['id_producto'],))
             row = cursor.fetchone()
@@ -613,7 +609,6 @@ def carrito_checkout():
 def boleteria_nuevo():
     form = BoletoForm()
 
-    # Populate choices before validation
     try:
         conn = conectar()
         if conn and conn.is_connected():
@@ -646,7 +641,6 @@ def boleteria_nuevo():
 
             cursor = conn.cursor()
 
-            # Check stock and get pelicula string
             cursor.execute(
                 'SELECT cantidad, nombre FROM productos WHERE id = %s', (form.id_producto.data,))
             row = cursor.fetchone()
@@ -671,7 +665,6 @@ def boleteria_nuevo():
                 conn.close()
                 return redirect(url_for('boleteria') if current_user.rol == 'admin' else url_for('productos'))
 
-            # Get hora_funcion string
             cursor.execute(
                 'SELECT fecha_hora FROM funcion WHERE id_funcion = %s', (form.id_funcion.data,))
             func_row = cursor.fetchone()
@@ -739,7 +732,6 @@ def boleteria_editar(id):
 
         form = BoletoForm()
 
-        # Populate choices
         cursor.execute('SELECT id, nombre FROM productos')
         productos = cursor.fetchall()
         form.id_producto.choices = [(p[0], p[1]) for p in productos]
@@ -753,12 +745,12 @@ def boleteria_editar(id):
         if request.method == 'GET':
             form.id_producto.data = row[5] if len(row) > 5 else None
             form.id_funcion.data = row[6] if len(row) > 6 else None
-            form.cantidad.data = 1  # Para obligar al script JS a dejar seleccionar solo 1 en edición
+            form.cantidad.data = 1  
             form.codigo_sala.data = row[2]  # codigo_sala
             form.butaca.data = row[3]  # butaca
 
         if form.validate_on_submit():
-            # Get textual strings for database
+            
             cursor.execute(
                 'SELECT nombre FROM productos WHERE id = %s', (form.id_producto.data,))
             pel_row = cursor.fetchone()
@@ -806,7 +798,6 @@ def boleteria_eliminar(id):
 
         cursor = conn.cursor()
 
-        # Get id_producto to restore stock
         cursor.execute(
             'SELECT id_producto FROM boleto WHERE id_boleto = %s', (id,))
         id_prod_row = cursor.fetchone()
@@ -870,8 +861,6 @@ def datos():
     return render_template('datos.html', datos_txt=datos_txt, datos_json=datos_json, datos_csv=datos_csv)
 
 # ruta para conexión a la base de datos
-
-
 @app.route('/conexion')
 @admin_required
 def conexion():
@@ -897,6 +886,6 @@ def conexion():
         error = f'Error al conectar a la base de datos: {e}'
         return render_template('conexion.html', error=error, rows=rows, columns=columns, table=table)
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
