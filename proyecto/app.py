@@ -71,7 +71,35 @@ def inicializar_tablas_restantes():
         except Exception as e:
             print(f"Error inicializando tablas: {e}")
 
+def insertar_peliculas_ejemplo():
+    conn = conectar()
+    if conn and conn.is_connected():
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM productos")
+            if cursor.fetchone()[0] == 0:
+                peliculas = [
+                    ('Interstellar', 'Un grupo de exploradores hace uso de un agujero de gusano para superar las limitaciones en los viajes espaciales y conquistar distancias interestelares.', 100, 7.50),
+                    ('Atacando París', 'Película de acción y suspenso en la capital francesa.', 80, 6.00),
+                    ('Avatar', 'Un marine parapléjico es enviado al planeta Pandora en una misión única.', 150, 8.00),
+                    ('Origen', 'Un ladrón que roba secretos corporativos a través del uso de la tecnología de compartir sueños.', 90, 7.00),
+                    ('Avengers', 'Los superhéroes más poderosos de la Tierra se unen para luchar contra un enemigo común.', 200, 8.50),
+                    ('El Caballero Oscuro', 'Batman se enfrenta a su mayor desafío, el criminal conocido como el Joker.', 120, 7.50),
+                    ('Matrix', 'Un hacker informático descubre la verdadera naturaleza de su realidad.', 100, 6.50),
+                    ('El Padrino', 'El patriarca de una familia criminal organiza el traspaso del control de su imperio.', 80, 5.50),
+                    ('Jurassic Park', 'Un parque temático que sufre una grave avería y los dinosaurios escapan.', 140, 6.50),
+                    ('Star Wars', 'La rebelión intenta destruir la Estrella de la Muerte del imperio galáctico.', 150, 7.00)
+                ]
+                cursor.executemany("INSERT INTO productos (nombre, descripcion, cantidad, precio) VALUES (%s, %s, %s, %s)", peliculas)
+                conn.commit()
+                print("10 Películas insertadas de ejemplo exitosamente.")
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error insertando películas: {e}")
+
 inicializar_tablas_restantes()
+insertar_peliculas_ejemplo()
 
 @login_manager.user_loader
 def load_user(user_id):
