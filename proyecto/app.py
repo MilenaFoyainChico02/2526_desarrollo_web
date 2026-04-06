@@ -31,6 +31,48 @@ login_manager.login_message_category = 'warning'
 
 crear_tabla_usuario()
 
+def inicializar_tablas_restantes():
+    conn = conectar()
+    if conn and conn.is_connected():
+        try:
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS productos (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    nombre VARCHAR(255) NOT NULL,
+                    descripcion TEXT,
+                    cantidad INT NOT NULL,
+                    precio DECIMAL(10, 2) NOT NULL
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS funcion (
+                    id_funcion INT AUTO_INCREMENT PRIMARY KEY,
+                    descripcion VARCHAR(255) NOT NULL,
+                    fecha_hora VARCHAR(50) NOT NULL,
+                    total DECIMAL(10,2) NOT NULL,
+                    metodo_pago VARCHAR(50)
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS boleto (
+                    id_boleto INT AUTO_INCREMENT PRIMARY KEY,
+                    pelicula VARCHAR(255),
+                    codigo_sala VARCHAR(50),
+                    butaca VARCHAR(50),
+                    hora_funcion VARCHAR(50),
+                    id_producto INT,
+                    id_funcion INT
+                )
+            ''')
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error inicializando tablas: {e}")
+
+inicializar_tablas_restantes()
+
 @login_manager.user_loader
 def load_user(user_id):
     return obtener_usuario_por_id(user_id)

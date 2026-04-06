@@ -26,8 +26,6 @@ def crear_tabla_usuario():
         return
 
     cursor = conn.cursor()
-
-    cursor.execute("DROP TABLE IF EXISTS usuario")
     
     cursor.execute(
         '''
